@@ -1,0 +1,52 @@
+.cardBlue {
+    -fx-background-color: #4A5CFF;
+    -fx-background-insets: 0,1,2,3;
+    -fx-background-radius: 3,2,2,2;
+    -fx-padding: 5 10 5 10;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+}
+
+.cardYellow {
+    -fx-background-color: #FFFB00;
+    -fx-background-insets: 0,1,2,3;
+    -fx-background-radius: 3,2,2,2;
+    -fx-padding: 5 10 5 10;
+    -fx-text-fill: black;
+    -fx-font-size: 12px;
+    -fx-border-color: black;
+    -fx-border-radius: 3,2,2,2;
+}
+
+.cardBlack {
+    -fx-background-color: #0A0A0A;
+    -fx-background-insets: 0,1,2,3;
+    -fx-background-radius: 3,2,2,2;
+    -fx-padding: 5 10 5 10;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+}
+
+.cardRed {
+    -fx-background-color: #CC2121;
+    -fx-background-insets: 0,1,2,3;
+    -fx-background-radius: 3,2,2,2;
+    -fx-padding: 5 10 5 10;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+}
+
+.cardEvent {
+    -fx-background-color: #767676;
+    -fx-background-insets: 0,1,2,3;
+    -fx-background-radius: 3,2,2,2;
+    -fx-padding: 5 10 5 10;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+}
+
+.invisible {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+
+}

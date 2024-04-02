@@ -1,0 +1,58 @@
+.cityButtonBlue{
+    -fx-background-color: transparent;
+    -fx-background-radius: 20px;
+    -fx-min-width: 40px;
+    -fx-min-height: 40px;
+    -fx-max-width: 40px;
+    -fx-max-height: 40px;
+    -fx-border-color: blue;
+    -fx-border-width: 2px;
+    -fx-border-radius: 20px;
+    -fx-cursor: hand;
+}
+
+.cityButtonYellow{
+    -fx-background-color: transparent;
+    -fx-background-radius: 20px;
+    -fx-min-width: 40px;
+    -fx-min-height: 40px;
+    -fx-max-width: 40px;
+    -fx-max-height: 40px;
+    -fx-border-color: yellow;
+    -fx-border-width: 2px;
+    -fx-border-radius: 20px;
+    -fx-cursor: hand;
+}
+
+.cityButtonRed{
+    -fx-background-color: transparent;
+    -fx-background-radius: 20px;
+    -fx-min-width: 40px;
+    -fx-min-height: 40px;
+    -fx-max-width: 40px;
+    -fx-max-height: 40px;
+    -fx-border-color: red;
+    -fx-border-width: 2px;
+    -fx-border-radius: 20px;
+    -fx-cursor: hand;
+}
+
+.cityButtonBlack{
+    -fx-background-color: transparent;
+    -fx-background-radius: 20px;
+    -fx-min-width: 40px;
+    -fx-min-height: 40px;
+    -fx-max-width: 40px;
+    -fx-max-height: 40px;
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+    -fx-border-radius: 20px;
+    -fx-cursor: hand;
+}
+
+.research_station{
+    -fx-background-image: url("../images/research_station.png");
+    -fx-background-size: 25px 25px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center center;
+}

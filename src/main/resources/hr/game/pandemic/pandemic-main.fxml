@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import java.net.URL?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Text?>
+
+<VBox alignment="CENTER" prefWidth="1913.0" spacing="0.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hr.game.pandemic.GameController">
+   <children>
+      <BorderPane>
+         <top>
+            <MenuBar BorderPane.alignment="CENTER">
+              <menus>
+                <Menu mnemonicParsing="false" text="Game">
+                  <items>
+                    <MenuItem mnemonicParsing="false" onAction="#newGame" text="New Game" />
+                        <MenuItem mnemonicParsing="false" onAction="#saveGame" text="Save" />
+                        <MenuItem mnemonicParsing="false" onAction="#loadGame" text="Load" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Documentation">
+                  <items>
+                    <MenuItem mnemonicParsing="false" text="Generate" />
+                  </items>
+                </Menu>
+              </menus>
+            </MenuBar>
+         </top>
+         <center>
+            <Pane fx:id="gamePane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="991.0" prefWidth="1920.0" BorderPane.alignment="CENTER">
+               <children>
+                  <ImageView fx:id="gameBoardImageView" fitHeight="991.0" fitWidth="1413.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@images/pandemic_jpeg.jpg" />
+                     </image>
+                  </ImageView>
+                  <Button fx:id="chicago" layoutX="170.0" layoutY="271.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlue">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="atlanta" layoutX="182.0" layoutY="352.0" mnemonicParsing="false" onAction="#cityButtonPressed">
+                     <styleClass>
+                        <String fx:value="cityButtonBlue" />
+                        <String fx:value="research_station" />
+                     </styleClass>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <GridPane fx:id="playersGridPane" layoutX="1400.0" prefHeight="991.0" prefWidth="520.0" stylesheets="@stylesheets/cardButtons.css">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints maxHeight="172.0" minHeight="10.0" prefHeight="172.0" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="176.0" minHeight="10.0" prefHeight="176.0" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="186.0" minHeight="10.0" prefHeight="179.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="212.0" minHeight="10.0" prefHeight="178.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="289.0" minHeight="10.0" prefHeight="286.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <GridPane fx:id="controlChatGrid" GridPane.rowIndex="4">
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints maxHeight="149.0" minHeight="10.0" prefHeight="119.0" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="191.0" minHeight="10.0" prefHeight="167.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <GridPane fx:id="controlGrid">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                              </GridPane>
+                           </children>
+                        </GridPane>
+                     </children>
+                  </GridPane>
+                  <ImageView fx:id="outbreak1" fitHeight="55.0" fitWidth="56.0" layoutX="47.0" layoutY="536.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@images/outbreak_token.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="outbreak2" fitHeight="55.0" fitWidth="56.0" layoutX="86.0" layoutY="594.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@images/outbreak_token.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="outbreak3" fitHeight="55.0" fitWidth="56.0" layoutX="86.0" layoutY="647.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@images/outbreak_token.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="outbreak4" fitHeight="55.0" fitWidth="56.0" layoutX="48.0" layoutY="702.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@images/outbreak_token.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="outbreak5" fitHeight="55.0" fitWidth="56.0" layoutX="47.0" layoutY="759.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@images/outbreak_token.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="outbreak6" fitHeight="55.0" fitWidth="56.0" layoutX="86.0" layoutY="806.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@images/outbreak_token.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="outbreak7" fitHeight="55.0" fitWidth="56.0" layoutX="86.0" layoutY="861.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@images/outbreak_token.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="outbreak8" fitHeight="55.0" fitWidth="56.0" layoutX="47.0" layoutY="916.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@images/outbreak_token.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="infection1" fitHeight="55.0" fitWidth="56.0" layoutX="964.0" layoutY="161.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@images/infection_rate_token.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="infection2" fitHeight="55.0" fitWidth="56.0" layoutX="1017.0" layoutY="161.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@images/infection_rate_token.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="infection3" fitHeight="55.0" fitWidth="56.0" layoutX="1070.0" layoutY="161.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@images/infection_rate_token.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="infection4" fitHeight="55.0" fitWidth="56.0" layoutX="1123.0" layoutY="161.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@images/infection_rate_token.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="infection5" fitHeight="55.0" fitWidth="56.0" layoutX="1174.0" layoutY="161.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@images/infection_rate_token.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="infection6" fitHeight="55.0" fitWidth="56.0" layoutX="1227.0" layoutY="161.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@images/infection_rate_token.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="infection7" fitHeight="55.0" fitWidth="56.0" layoutX="1279.0" layoutY="161.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@images/infection_rate_token.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="yellowCure" fitHeight="61.0" fitWidth="40.0" layoutX="498.0" layoutY="931.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@images/yellow_cure.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="redCure" fitHeight="61.0" fitWidth="40.0" layoutX="552.0" layoutY="931.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@images/red_cure.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="blueCure" fitHeight="61.0" fitWidth="40.0" layoutX="603.0" layoutY="931.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@images/blue_cure.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="blackCure" fitHeight="61.0" fitWidth="40.0" layoutX="651.0" layoutY="931.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@images/black_cure.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="128.0" fitWidth="198.0" layoutX="933.0" layoutY="23.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@images/infection_card_back.png" />
+                     </image>
+                  </ImageView>
+                  <Button fx:id="infectionDiscard" layoutX="1177.0" layoutY="20.0" mnemonicParsing="false" prefHeight="128.0" prefWidth="180.0" style="-fx-font-size: 24;" styleClass="invisible" stylesheets="@stylesheets/cardButtons.css" />
+                  <ImageView fitHeight="193.0" fitWidth="124.0" layoutX="901.0" layoutY="767.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@images/player_card_back.png" />
+                     </image>
+                  </ImageView>
+                  <Button fx:id="playerDiscard" layoutX="1089.0" layoutY="767.0" mnemonicParsing="false" prefHeight="173.0" prefWidth="124.0" styleClass="invisible" stylesheets="@stylesheets/cardButtons.css" />
+                  <Button fx:id="montreal" layoutX="250.0" layoutY="261.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlue">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="sanFrancisco" layoutX="9.0" layoutY="317.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlue">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="newYork" layoutX="307.0" layoutY="302.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlue">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="washington" layoutX="264.0" layoutY="362.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlue">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="losAngeles" layoutX="40.0" layoutY="394.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonYellow">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="mexicoCity" layoutX="133.0" layoutY="439.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonYellow">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="miami" layoutX="233.0" layoutY="438.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonYellow">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="bogota" layoutX="263.0" layoutY="518.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonYellow">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="lima" layoutX="251.0" layoutY="601.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonYellow">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="saoPaulo" layoutX="416.0" layoutY="654.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonYellow">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="santiago" layoutX="277.0" layoutY="719.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonYellow">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="buenosAires" layoutX="358.0" layoutY="740.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonYellow">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="lagos" layoutX="655.0" layoutY="498.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonYellow">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="khartoum" layoutX="807.0" layoutY="476.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonYellow">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="kinshasa" layoutX="722.0" layoutY="563.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonYellow">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="johannesburg" layoutX="788.0" layoutY="692.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonYellow">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="london" layoutX="612.0" layoutY="221.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlue">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="madrid" layoutX="611.0" layoutY="333.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlue">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="paris" layoutX="658.0" layoutY="275.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlue">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="essen" layoutX="711.0" layoutY="222.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlue">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="stPetersburg" layoutX="805.0" layoutY="186.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlue">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="milan" layoutX="742.0" layoutY="292.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlue">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="moscow" layoutX="882.0" layoutY="226.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlack">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="istanbul" layoutX="812.0" layoutY="318.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlack">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="algiers" layoutX="658.0" layoutY="387.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlack">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="cairo" layoutX="795.0" layoutY="394.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlack">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="baghdad" layoutX="879.0" layoutY="362.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlack">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="tehran" layoutX="944.0" layoutY="312.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlack">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="riyadh" layoutX="882.0" layoutY="427.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlack">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="karachi" layoutX="991.0" layoutY="388.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlack">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="delhi" layoutX="1063.0" layoutY="367.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlack">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="mumbai" layoutX="984.0" layoutY="457.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlack">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="kolkata" layoutX="1081.0" layoutY="431.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlack">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="chennai" layoutX="1045.0" layoutY="509.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonBlack">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="bangkok" layoutX="1139.0" layoutY="475.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonRed">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="hongKong" layoutX="1180.0" layoutY="397.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonRed">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="jakarta" layoutX="1187.0" layoutY="585.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonRed">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="hoChiMinhCity" layoutX="1217.0" layoutY="484.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonRed">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="manila" layoutX="1296.0" layoutY="505.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonRed">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="sydney" layoutX="1346.0" layoutY="720.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonRed">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="taipei" layoutX="1296.0" layoutY="431.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonRed">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="shanghai" layoutX="1241.0" layoutY="355.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonRed">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="beijing" layoutX="1208.0" layoutY="288.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonRed">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="seoul" layoutX="1279.0" layoutY="271.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonRed">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="osaka" layoutX="1350.0" layoutY="382.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonRed">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="tokyo" layoutX="1350.0" layoutY="307.0" mnemonicParsing="false" onAction="#cityButtonPressed" styleClass="cityButtonRed">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Group layoutX="518.0" layoutY="837.0">
+                     <children>
+                        <Circle fill="#d8eb2f" radius="23.0" stroke="BLACK" strokeType="INSIDE" />
+                        <Text fx:id="cubeCounterYellow" layoutX="-7.0" layoutY="5.0" strokeType="OUTSIDE" strokeWidth="0.0" text="24" />
+                     </children>
+                  </Group>
+                  <Group layoutX="572.0" layoutY="837.0">
+                     <children>
+                        <Circle fill="#dd2828" radius="23.0" stroke="BLACK" strokeType="INSIDE" />
+                        <Text fx:id="cubeCounterRed" layoutX="-7.0" layoutY="5.0" strokeType="OUTSIDE" strokeWidth="0.0" text="24" />
+                     </children>
+                  </Group>
+                  <Group layoutX="623.0" layoutY="837.0">
+                     <children>
+                        <Circle fill="DODGERBLUE" radius="23.0" stroke="BLACK" strokeType="INSIDE" />
+                        <Text fx:id="cubeCounterBlue" layoutX="-7.0" layoutY="5.0" strokeType="OUTSIDE" strokeWidth="0.0" text="24" />
+                     </children>
+                  </Group>
+                  <Group layoutX="675.0" layoutY="837.0">
+                     <children>
+                        <Circle radius="23.0" stroke="BLACK" strokeType="INSIDE" />
+                        <Text fx:id="cubeCounterBlack" fill="WHITE" layoutX="-7.0" layoutY="5.0" strokeType="OUTSIDE" strokeWidth="0.0" text="24" />
+                     </children>
+                  </Group>
+               </children>
+               <stylesheets>
+                  <URL value="@stylesheets/cityButtons.css" />
+                  <URL value="@stylesheets/cardButtons.css" />
+               </stylesheets>
+            </Pane>
+         </center>
+      </BorderPane>
+   </children>
+</VBox>
