@@ -12,9 +12,17 @@ public class GameState {
     public static Integer BLUE_CUBES;
     public static Integer BLACK_CUBES;
     public static Integer RESEARCH_STATIONS;
+    public static boolean YELLOW_CURE;
+    public static boolean RED_CURE;
+    public static boolean BLUE_CURE;
+    public static boolean BLACK_CURE;
+    public static boolean YELLOW_ERADICATED;
+    public static boolean RED_ERADICATED;
+    public static boolean BLUE_ERADICATED;
+    public static boolean BLACK_ERADICATED;
 
     public static int getCurrentPlayerNumber() {
-        return GameState.NUMBER_OF_TURNS % GameState.NUMBER_OF_PLAYERS;
+        return (GameState.NUMBER_OF_TURNS % GameState.NUMBER_OF_PLAYERS) + 1;
     }
 
 }

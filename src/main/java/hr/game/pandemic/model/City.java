@@ -64,7 +64,7 @@ public class City {
         this.researchStation = researchStation;
     }
 
-    public boolean infect(String disease) {
+    public boolean infect(String disease, int amount) {
         int n = 0;
         if (this.diseases.contains(disease)) {
             for (String d : this.diseases) {
@@ -73,10 +73,21 @@ public class City {
             }
         }
 
-        if (n < 3)
-            this.diseases.add(disease);
-        else {
-            return true;
+        for (int i = 0; i < amount; i++) {
+            if (n < 3){
+                this.diseases.add(disease);
+                if (disease.equals("yellow"))
+                    GameState.YELLOW_CUBES--;
+                if (disease.equals("red"))
+                    GameState.RED_CUBES--;
+                if (disease.equals("blue"))
+                    GameState.BLUE_CUBES--;
+                if (disease.equals("black"))
+                    GameState.BLACK_CUBES--;
+                n++;
+            } else {
+                return true;
+            }
         }
         return false;
     }
@@ -115,5 +126,29 @@ public class City {
                 n++;
         }
         return n;
+    }
+
+    public void cureOneOfDisease(String color) {
+        if (color.equals("yellow"))
+            GameState.YELLOW_CUBES++;
+        if (color.equals("red"))
+            GameState.RED_CUBES++;
+        if (color.equals("blue"))
+            GameState.BLUE_CUBES++;
+        if (color.equals("black"))
+            GameState.BLACK_CUBES++;
+        this.diseases.remove(color);
+    }
+
+    public void cureAllOfDisease(String color) {
+        if (color.equals("yellow"))
+            GameState.YELLOW_CUBES += getYellowDiseases();
+        if (color.equals("red"))
+            GameState.RED_CUBES += getRedDiseases();
+        if (color.equals("blue"))
+            GameState.BLUE_CUBES += getBlueDiseases();
+        if (color.equals("black"))
+            GameState.BLACK_CUBES += getBlackDiseases();
+        this.diseases.removeIf(color::equals);
     }
 }

@@ -1,10 +1,7 @@
 package hr.game.pandemic;
 
 import hr.game.pandemic.model.*;
-import hr.game.pandemic.util.ActionUtil;
-import hr.game.pandemic.util.ControlUtil;
-import hr.game.pandemic.util.DialogUtil;
-import hr.game.pandemic.util.FXMLUtil;
+import hr.game.pandemic.util.*;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
@@ -18,25 +15,22 @@ import org.json.simple.parser.JSONParser;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class GameController {
     @FXML
     private Pane gamePane;
     public static Pane _gamePane;
-    private List<CityCard> infectionCardPile;
-    private List<CityCard> infectionDiscardPile;
-    private static List<Card> playerCardPile;
-    private static List<Card> playerDiscardPile;
+    public static List<CityCard> infectionCardPile;
+    public static List<CityCard> infectionDiscardPile;
+    public static List<Card> playerCardPile;
+    public static List<Card> playerDiscardPile;
     private static List<EventCard> eventCards = new ArrayList<>();
     private static List<CityCard> cityCards = new ArrayList<>();
-    private static List<Player> players;
-    private static List<City> cities = new ArrayList<>();
+    public static List<Player> players;
+    public static List<City> cities = new ArrayList<>();
     public static List<List<String>> citiesColors = new ArrayList<>();
-    private List<String> outbreaksInCitiesInCurrentChain = new ArrayList<>();
+    private static List<String> outbreaksInCitiesInCurrentChain = new ArrayList<>();
     public void initialize() {
         _gamePane = gamePane;
         //Read cities and their corresponding colors from file
@@ -59,7 +53,7 @@ public class GameController {
                 cities.add(new City(s.get(0), s.get(1)));
         }
 
-        ControlUtil.disableAllCityButtons();
+        ControlUtils.disableAllCityButtons();
 
         //Read all event cards from file
         JSONParser parser = new JSONParser();
@@ -78,26 +72,8 @@ public class GameController {
         }
 
         for (City c : cities) {
-            FXMLUtil.addGridViewForPlayersToCity(c);
+            FXMLUtils.addGridViewForPlayersAndLabelsForDiseasesToCity(c);
         }
-
-
-        /*for(Button b : allButtons){
-            Tooltip newTooltip = new Tooltip();
-            newTooltip.setText(b.getText());
-            b.setTooltip(newTooltip);
-
-            for(CityCard cc : cityCards) {
-                if(cc.getName().equals(b.getId())){
-                    if (cc.getName().equals("atlanta"))
-                        b.setUserData(new City(cc.getName(), cc.getColor(), true));
-                    else
-                        b.setUserData(new City(cc.getName(), cc.getColor()));
-                }
-            }
-        }
-
-*/
 
         while(GameState.DIFFICULTY == null)
             newGame();
@@ -105,18 +81,32 @@ public class GameController {
 
     public void cityButtonPressed(Event event) {
         if (event.getSource() instanceof Button b) {
-//            System.out.println( b.getId());
-//            ActionUtil.driveFerryCityClicked(players.get(GameState.getCurrentPlayerNumber()-1), b);
-            ActionUtil.moveCurrentPlayerToCity(b.getId());
-            ActionUtil.actionDone();
+            if (EventsUtils.governmentGrandPlayed){
+                City newResearchStationCity = GameController.cities.stream()
+                        .filter(c -> c.getName().equals(b.getId()))
+                        .findAny()
+                        .orElse(null);
+                newResearchStationCity.setResearchStation(true);
+                ControlUtils.citiesWithResearchStation.add(newResearchStationCity);
+                Button cityButton = (Button) FXMLUtils.getNodeById(newResearchStationCity.getName(), GameController._gamePane);
+                cityButton.getStyleClass().add("research_station");
+
+                ControlUtils.disableAllCityButtons();
+                ControlUtils.enableAllControls();
+                ControlUtils.enableAllPlayerHandCards();
+            } else if (EventsUtils.airliftPlayed) {
+                MovementActionUtils.moveCurrentPlayerToCity(b.getId());
+                ControlUtils.currentPlayer = players.get(GameState.getCurrentPlayerNumber() - 1);
+                EventsUtils.airliftPlayed = false;
+                ControlUtils.enableAllControls();
+                ControlUtils.enableAllPlayerHandCards();
+            } else {
+                MovementActionUtils.moveCurrentPlayerToCity(b.getId());
+                MovementActionUtils.actionDone();
+            }
+
         }
 
-    }
-
-    public void cardButtonPressed(Event event) {
-        if (event.getSource() instanceof Button b) {
-
-        }
     }
     public void saveGame() {
 
@@ -125,20 +115,28 @@ public class GameController {
 
     }
     public void newGame() {
-        boolean startGame = DialogUtil.showNewGameDialog();
+        boolean startGame = DialogUtils.showNewGameDialog();
         if (startGame) {
-            GameState.NUMBER_OF_TURNS = 1;
+            GameState.NUMBER_OF_TURNS = 0;
             GameState.OUTBREAK_COUNTER = 0;
             GameState.INFECTION_RATE = 1;
             GameState.YELLOW_CUBES = 24;
             GameState.RED_CUBES = 24;
             GameState.BLUE_CUBES = 24;
             GameState.BLACK_CUBES = 24;
-            GameState.RESEARCH_STATIONS = 6;
+            GameState.RESEARCH_STATIONS = 5;
+            GameState.YELLOW_CURE = false;
+            GameState.RED_CURE = false;
+            GameState.BLUE_CURE = false;
+            GameState.BLACK_CURE = false;
+            GameState.YELLOW_ERADICATED = false;
+            GameState.RED_ERADICATED = false;
+            GameState.BLUE_ERADICATED = false;
+            GameState.BLACK_ERADICATED = false;
 
-            GridPane playersGrid = (GridPane) FXMLUtil.getNodeById("playersGridPane", _gamePane);
+            GridPane playersGrid = (GridPane) FXMLUtils.getNodeById("playersGridPane", _gamePane);
             for (int i = 0; i < GameState.NUMBER_OF_PLAYERS; i++) {
-                FXMLUtil.addPlayerToPlayersGrid(playersGrid, i+1);
+                FXMLUtils.addPlayerToPlayersGrid(playersGrid, i+1);
             }
 
             List<Role> roles = new ArrayList<>(List.of(Role.values()));
@@ -149,8 +147,8 @@ public class GameController {
             for (int i = 0; i < GameState.NUMBER_OF_PLAYERS; i++) {
                 players.add(new Player("Player" + (i+1), roles.getLast()));
                 roles.removeLast();
-                FXMLUtil.updatePlayerLocation(players.get(i));
-                FXMLUtil.updatePlayerRole(players.get(i));
+                FXMLUtils.updatePlayerLocation(players.get(i));
+                FXMLUtils.updatePlayerRole(players.get(i));
             }
 
             //Add cards to infection pile and shuffle
@@ -158,17 +156,37 @@ public class GameController {
             Collections.shuffle(infectionCardPile);
             infectionDiscardPile = new ArrayList<>();
 
-            //Add initial cards to player card pile and shuffle
+            //Add initial cards to player card pile and shuffle, empty player discard pile
             playerCardPile = new ArrayList<>(cityCards);
             playerCardPile.addAll(eventCards);
             Collections.shuffle(playerCardPile);
+            playerDiscardPile = new ArrayList<>();
+
+            //Empty research station list and add Atlanta
+            ControlUtils.citiesWithResearchStation.clear();
+            for (City c : cities) {
+                if (c.getName().equals("atlanta"))
+                    ControlUtils.citiesWithResearchStation.add(c);
+            }
 
             //Players draw cards
             for (int i = 0; i < GameState.NUMBER_OF_PLAYERS; i++) {
                 for (int j = 0; j < 6 - GameState.NUMBER_OF_PLAYERS; j++){
-                    playerDrawCard(i);
+                    playerDrawCard(players.get(i));
                 }
             }
+//          Dodaj 5 plavih karica prvom igraču
+//            for (int i = 0; i < 5; i++) {
+//                Card cardTmp = playerCardPile.stream()
+//                        .filter(c -> c.getClass().equals(CityCard.class))
+//                        .filter(c -> ((CityCard) c).getColor().equals("blue"))
+//                        .findAny()
+//                        .orElse(null);
+//                players.getFirst().addCardToHand(cardTmp);
+//                playerCardPile.remove(cardTmp);
+//            }
+//            refreshPlayerHand(players.getFirst());
+
             //Add epidemic cards to player card pile and shuffle
             for (int i = 0; i < GameState.DIFFICULTY + 3; i++) {
                 playerCardPile.add(new EpidemicCard());
@@ -178,79 +196,136 @@ public class GameController {
             //Start of game infections
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
-                    for (int k = 0; k < 3 - i; k++)
-                        drawInfectionCard(true);
+                    drawInfectionCard();
+                    infectCity(infectionDiscardPile.getLast().getName(), infectionDiscardPile.getLast().getColor(), 3 - i);
                 }
             }
 
-            ControlUtil.showPhaseOneControls(players.getFirst());
+            ControlUtils.showPhaseOneControls(players.getFirst());
         }
     }
 
-    public static void playerDrawCard(Integer playerIndex) {
-        players.get(playerIndex).addCardToHand(playerCardPile.getLast());
+    public static boolean playerDrawCard(Player player) {
+        if (playerCardPile.getLast().getName().equals("Epidemic")) {
+            playerCardPile.removeLast();
+            return true;
+        }
+        player.addCardToHand(playerCardPile.getLast());
         playerCardPile.removeLast();
-        refreshPlayerHand(playerIndex);
+        checkIfPlayerHasTooManyCards(player);
+        refreshPlayerHand(player);
+        return false;
     }
 
-    public static void refreshPlayerHand(Integer playerIndex) {
-        GridPane playerHandGrid = (GridPane) FXMLUtil.getNodeById("player" + (playerIndex+1) + "Hand", GameController._gamePane);
+    public static void playerDiscardCard(Player player, Card cardToDiscard) {
+        player.removeCardFromHand(cardToDiscard);
+        playerDiscardPile.add(cardToDiscard);
+        refreshPlayerHand(player);
+        refreshPlayerDiscardPile();
+    }
+
+    public static void checkIfPlayerHasTooManyCards(Player player) {
+        if (player.getHand().size() > 7) {
+            Card pickedCard = DialogUtils.showPickACardDialog(player, "city event", "Pick a city card to discard or event card to play.");
+            if (pickedCard != null) {
+                if (Character.isUpperCase(pickedCard.getName().charAt(0))) {
+                    //play event card
+                    EventsUtils.onEventCardPlay((EventCard) pickedCard, player);
+                } else {
+                    playerDiscardCard(player, pickedCard);
+                }
+            }
+        }
+        if (player.getHand().size() > 7)
+            checkIfPlayerHasTooManyCards(player);
+    }
+
+    public static void refreshPlayerHand(Player player) {
+        GridPane playerHandGrid = (GridPane) FXMLUtils.getNodeById(player.getName().toLowerCase() + "Hand", GameController._gamePane);
         playerHandGrid.getChildren().clear();
-        List<Card> playerHandCards = players.get(playerIndex).getHand();
-        for (int k = 0; k < playerHandCards.size(); k++) {
-            Card tmpCard = players.get(playerIndex).getHand().get(k);
+        for (int k = 0; k < player.getHand().size(); k++) {
+            Card tmpCard = player.getHand().get(k);
             Button tmpButton = new Button(tmpCard.getName().substring(0, 1).toUpperCase() + tmpCard.getName().substring(1));
             GridPane.setMargin(tmpButton, new Insets(10, 10, 10, 10));
             tmpButton.setUserData(tmpCard);
-            tmpButton.setId("player" + (playerIndex+1) + tmpCard.getName());
+            tmpButton.setId(player.getName().toLowerCase() + tmpCard.getName());
             tmpButton.setCursor(Cursor.HAND);
             GridPane.setHalignment(tmpButton, HPos.CENTER);
             if (tmpCard instanceof CityCard cc) {
                 tmpButton.getStyleClass().add("card" + cc.getColor().substring(0, 1).toUpperCase() + cc.getColor().substring(1));
             } else if (tmpCard instanceof EventCard) {
                 tmpButton.getStyleClass().add("cardEvent");
+                tmpButton.setUserData(tmpCard);
+                tmpButton.setOnAction(EventsUtils::onEventCardClick);
             }
             playerHandGrid.add(tmpButton, k%4, k/4);
         }
     }
 
-    public void drawInfectionCard(boolean startOfgame) {
+
+
+    public static void drawInfectionCard() {
         CityCard drawnCard = infectionCardPile.getLast();
         infectionCardPile.removeLast();
         infectionDiscardPile.add(drawnCard);
-
-        if (!startOfgame) {
-            outbreaksInCitiesInCurrentChain = new ArrayList<>();
-            infectCity(drawnCard.getName(), drawnCard.getColor());
-        }
+        refreshInfectionDiscardPile();
     }
 
-    public void infectAdjacentCities(String sourceCityName, String diseaseColor) {
+    public static void infectAdjacentCities(String sourceCityName, String diseaseColor) {
         List<String> citiesToInfect = CityGraph.cityGraph.get(sourceCityName);
 
         for (String s : citiesToInfect) {
             if (!outbreaksInCitiesInCurrentChain.contains(s)) {
-                infectCity(s, diseaseColor);
+                infectCity(s, diseaseColor, 1);
             }
         }
-
     }
 
-    public void infectCity(String cityName, String diseaseColor) {
+    public static void infectCity(String cityName, String diseaseColor, int amount) {
         for(City cityToInfect : cities) {
             if (cityToInfect.getName().equals(cityName)) {
-
-                boolean toOutbreak = cityToInfect.infect(diseaseColor);
-
+                boolean toOutbreak = cityToInfect.infect(diseaseColor, amount);
+                FXMLUtils.refreshCityButtonText(cityToInfect);
+                FXMLUtils.refreshDiseaseCubeCount();
                 if (toOutbreak) {
                     outbreaksInCitiesInCurrentChain.add(cityName);
                     GameState.OUTBREAK_COUNTER++;
-                    FXMLUtil.moveOutbreakToken(_gamePane);
+                    FXMLUtils.moveOutbreakToken();
                     infectAdjacentCities(cityName, diseaseColor);
                 }
             }
         }
     }
 
+    public static void refreshPlayerDiscardPile() {
+        Button discardPileButton = (Button) FXMLUtils.getNodeById("playerDiscard", _gamePane);
+        if (playerDiscardPile.isEmpty()) {
+            discardPileButton.getStyleClass().removeLast();
+            discardPileButton.getStyleClass().add("invisible");
+            discardPileButton.setText("");
+        } else {
+            Card topCard = playerDiscardPile.getLast();
+            discardPileButton.getStyleClass().removeLast();
+            if (topCard instanceof CityCard cc)
+                discardPileButton.getStyleClass().add("card" + cc.getColor().substring(0, 1).toUpperCase() + cc.getColor().substring(1));
+            else
+                discardPileButton.getStyleClass().add("cardEvent");
+            discardPileButton.setText(topCard.getName().substring(0, 1).toUpperCase() + topCard.getName().substring(1));
+        }
+    }
+
+    public static void refreshInfectionDiscardPile() {
+        Button discardPileButton = (Button) FXMLUtils.getNodeById("infectionDiscard", _gamePane);
+        if (infectionDiscardPile.isEmpty()) {
+            discardPileButton.getStyleClass().removeLast();
+            discardPileButton.getStyleClass().add("invisible");
+            discardPileButton.setText("");
+        } else {
+            CityCard topCard = infectionDiscardPile.getLast();
+            discardPileButton.getStyleClass().removeLast();
+            discardPileButton.getStyleClass().add("card" + topCard.getColor().substring(0, 1).toUpperCase() + topCard.getColor().substring(1));
+            discardPileButton.setText(topCard.getName().substring(0, 1).toUpperCase() + topCard.getName().substring(1));
+        }
+    }
 
 }

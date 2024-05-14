@@ -56,3 +56,21 @@
     -fx-background-repeat: no-repeat;
     -fx-background-position: center center;
 }
+
+.disease_label .text{
+    -fx-text-fill: black;
+    -fx-stroke: white;
+    -fx-stroke-width: 1px;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.disease_label_bigger .text {
+    -fx-text-fill: black;
+    -fx-stroke: white;
+    -fx-stroke-width: 1px;
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+    -fx-translate-x: -46px;
+    -fx-translate-y: -12px;
+}

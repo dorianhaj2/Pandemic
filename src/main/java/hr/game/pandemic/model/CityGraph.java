@@ -7,55 +7,6 @@ import java.util.Map;
 import static java.util.Map.entry;
 
 public class CityGraph {
-//    @FXML public static Button paris;
-//    @FXML public static Button chicago;
-//    @FXML public static Button "madrid";
-//    @FXML public static Button essen;
-//    @FXML public static Button london;
-//    @FXML public static Button newYork;
-//    @FXML public static Button washington;
-//    @FXML public static Button sanFrancisco;
-//    @FXML public static Button montreal;
-//    @FXML public static Button atlanta;
-//    @FXML public static Button milan;
-//    @FXML public static Button stPetersburg;
-//    @FXML public static Button bogota;
-//    @FXML public static Button "mexicoCity";
-//    @FXML public static Button "khartoum";
-//    @FXML public static Button "saoPaulo";
-//    @FXML public static Button "miami";
-//    @FXML public static Button "losAngeles";
-//    @FXML public static Button "kinshasa";
-//    @FXML public static Button "lagos";
-//    @FXML public static Button "lima";
-//    @FXML public static Button "buenosAires";
-//    @FXML public static Button "johannesburg";
-//    @FXML public static Button "santiago";
-//    @FXML public static Button "istanbul";
-//    @FXML public static Button "baghdad";
-//    @FXML public static Button "delhi";
-//    @FXML public static Button "karachi";
-//    @FXML public static Button "cairo";
-//    @FXML public static Button "chennai";
-//    @FXML public static Button "tehran";
-//    @FXML public static Button "algiers";
-//    @FXML public static Button "kolkata";
-//    @FXML public static Button "mumbai";
-//    @FXML public static Button "riyadh";
-//    @FXML public static Button "moscow";
-//    @FXML public static Button "hongKong";
-//    @FXML public static Button "shanghai";
-//    @FXML public static Button "manila";
-//    @FXML public static Button "bangkok";
-//    @FXML public static Button "hoChiMinhCity";
-//    @FXML public static Button "taipei";
-//    @FXML public static Button "jakarta";
-//    @FXML public static Button "tokyo";
-//    @FXML public static Button "seoul";
-//    @FXML public static Button "sydney";
-//    @FXML public static Button "beijing";
-//    @FXML public static Button "osaka";
-
     public static Map<String, List<String>> cityGraph = Map.ofEntries(
             entry("paris", Arrays.asList("essen", "london", "madrid", "milan", "algiers")),
             entry("chicago", Arrays.asList("atlanta", "sanFrancisco", "montreal", "losAngeles", "mexicoCity")),
@@ -72,7 +23,7 @@ public class CityGraph {
             entry("bogota", Arrays.asList("buenosAires", "lima", "mexicoCity", "miami", "saoPaulo")),
             entry("mexicoCity", Arrays.asList("bogota", "lima", "losAngeles", "miami", "chicago")),
             entry("khartoum", Arrays.asList("johannesburg", "kinshasa", "lagos", "cairo")),
-            entry("saoPaulo", Arrays.asList("bogota", "buenosAires", "lagos", "cairo")),
+            entry("saoPaulo", Arrays.asList("bogota", "buenosAires", "lagos")),
             entry("miami", Arrays.asList("bogota", "mexicoCity", "atlanta", "washington")),
             entry("losAngeles", Arrays.asList("mexicoCity", "chicago", "sanFrancisco", "sydney")),
             entry("kinshasa", Arrays.asList("johannesburg", "khartoum", "lagos")),
