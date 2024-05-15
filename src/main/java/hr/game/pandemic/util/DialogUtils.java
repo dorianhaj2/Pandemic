@@ -146,6 +146,20 @@ public class DialogUtils {
         }
     }
 
+    private static void pickAnInfectionCardButtonClick(Event event) {
+        if (event.getSource() instanceof Button b) {
+            int bRow = GridPane.getRowIndex(b);
+            int bColumn = GridPane.getColumnIndex(b);
+            Button prevPickedButton = (Button) getNodeByCoordinate(pickGrid, 6, 1);
+            if (prevPickedButton != null){
+                GridPane.setColumnIndex(prevPickedButton, bColumn);
+                GridPane.setRowIndex(prevPickedButton, bRow);
+            }
+            GridPane.setColumnIndex(b, 1);
+            GridPane.setRowIndex(b, 6);
+        }
+    }
+
     private static Node getNodeByCoordinate(GridPane gridLayout, int row, int column) {
         for (Node node : gridLayout.getChildren()) {
             if(GridPane.getRowIndex(node) == row && GridPane.getColumnIndex(node) == column){
@@ -436,6 +450,53 @@ public class DialogUtils {
                     Button pickedColor = (Button) getNodeByCoordinate(pickGrid, 2, 1);
                     if (pickedColor != null) {
                         return pickedColor.getText().toLowerCase();
+                    } else
+                        return null;
+                } else if (clickedButton.get() == ButtonType.CANCEL) {
+                    return null;
+                }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static CityCard showPickAnInfectionCardDialog() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(GameApplication.class.getResource("dialog_fxmls/pick-an-infection-card-dialog.fxml"));
+            DialogPane pickACardDialogPane = fxmlLoader.load();
+            pickACardDialogPane.getStylesheets().add(DialogUtils.class.getResource("/hr/game/pandemic/stylesheets/cardButtons.css").toExternalForm());
+
+            Dialog<ButtonType> dialog = new Dialog<>();
+            dialog.setTitle("Pick an infection card to remove from the infection discard pile.");
+
+            pickGrid = (GridPane) FXMLUtils.getNodeById("pickACardGridPane", pickACardDialogPane);
+
+            for (int i = 0; i < GameController.infectionDiscardPile.size(); i++) {
+                CityCard tmpCard = GameController.infectionDiscardPile.get(i);
+                Button tmpButton = new Button(tmpCard.getName().substring(0, 1).toUpperCase() + tmpCard.getName().substring(1));
+                GridPane.setMargin(tmpButton, new Insets(10, 10, 10, 10));
+                tmpButton.setUserData(tmpCard);
+                tmpButton.setId(tmpCard.getName());
+                tmpButton.setCursor(Cursor.HAND);
+                tmpButton.setOnAction(DialogUtils::pickAnInfectionCardButtonClick);
+                GridPane.setHalignment(tmpButton, HPos.CENTER);
+
+                tmpButton.getStyleClass().add("card" + tmpCard.getColor().substring(0, 1).toUpperCase() + tmpCard.getColor().substring(1));
+
+                pickGrid.add(tmpButton, i%8, i/6);
+            }
+
+            dialog.setDialogPane(pickACardDialogPane);
+
+            Optional<ButtonType> clickedButton = dialog.showAndWait();
+
+            if(clickedButton.isPresent())
+                if(clickedButton.get() == ButtonType.OK) {
+                    Button pickedCard = (Button) getNodeByCoordinate(pickGrid, 6, 1);
+                    if (pickedCard != null) {
+                        return (CityCard) pickedCard.getUserData();
                     } else
                         return null;
                 } else if (clickedButton.get() == ButtonType.CANCEL) {

@@ -1,21 +1,26 @@
 package hr.game.pandemic.util;
 
 import hr.game.pandemic.GameController;
+import hr.game.pandemic.model.City;
 import hr.game.pandemic.model.CityCard;
 import hr.game.pandemic.model.EventCard;
 import hr.game.pandemic.model.Player;
 import javafx.event.Event;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class EventsUtils {
 
     private static boolean cardPlayed;
     public static boolean airliftPlayed = false;
     public static boolean governmentGrandPlayed = false;
+    public static boolean oneQuietNightPlayed = false;
 
     public static void onEventCardClick(Event event) {
         if (event.getSource() instanceof Button b) {
@@ -33,6 +38,10 @@ public class EventsUtils {
             onAirliftEventPlay(eventPlayer);
         else if (eventCard.getName().equals("Government Grant"))
             onGovernmentGrantEventPlay();
+        else if (eventCard.getName().equals("Resilient Population"))
+            onResilientPopulationPlay();
+        else if (eventCard.getName().equals("One Quiet Night"))
+            onOneQuietNightEventPlay();
 
         if (cardPlayed)
             GameController.playerDiscardCard(eventPlayer, eventCard);
@@ -81,11 +90,24 @@ public class EventsUtils {
     }
 
     public static void onResilientPopulationPlay() {
-
+        CityCard cardToRemove = DialogUtils.showPickAnInfectionCardDialog();
+        if (cardToRemove != null) {
+            GameController.infectionDiscardPile.remove(cardToRemove);
+            GameController.refreshInfectionDiscardPile();
+            cardPlayed = true;
+        }
     }
 
     public static void onOneQuietNightEventPlay() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("One Quiet Night");
+        alert.setHeaderText("Are you sure you want to play this event card?");
 
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            oneQuietNightPlayed = true;
+            cardPlayed = true;
+        }
     }
 
     public static void onGovernmentGrantEventPlay() {

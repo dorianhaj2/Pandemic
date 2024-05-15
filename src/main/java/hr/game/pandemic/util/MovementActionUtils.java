@@ -88,6 +88,8 @@ public class MovementActionUtils {
 
     public static void startPhaseThree() {
         int amountOfInfectionCardsToDraw = (GameState.INFECTION_RATE/2) +  1;
+        if (EventsUtils.oneQuietNightPlayed)
+            amountOfInfectionCardsToDraw = 0;
         if (amountOfInfectionCardsToDraw == 1)
             amountOfInfectionCardsToDraw++;
         for (int i = 0; i < amountOfInfectionCardsToDraw; i++) {

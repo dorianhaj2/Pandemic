@@ -16,7 +16,7 @@
     "description" : "Remove any 1 card in the Infection Discard Pile from the game. You may play this between the Infect and Intensify steps of an epidemic."
   },
   {
-    "name" : "One Quiet night",
+    "name" : "One Quiet Night",
     "description" : "Skip the next Infect Cities step(do not flip over any Infection cards)"
   }
 ]

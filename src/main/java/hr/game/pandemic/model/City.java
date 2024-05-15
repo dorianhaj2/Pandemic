@@ -66,6 +66,7 @@ public class City {
 
     public boolean infect(String disease, int amount) {
         int n = 0;
+        System.out.println("Infecting " + name);
         if (this.diseases.contains(disease)) {
             for (String d : this.diseases) {
                 if (d.equals(disease))
