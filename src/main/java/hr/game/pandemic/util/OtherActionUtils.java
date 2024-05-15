@@ -4,6 +4,7 @@ import hr.game.pandemic.GameController;
 import hr.game.pandemic.model.*;
 import javafx.event.Event;
 import javafx.scene.control.Button;
+import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -155,6 +156,9 @@ public class OtherActionUtils {
                     GameState.RED_CURE = true;
                 else if (pickedColor.equals("black"))
                     GameState.BLACK_CURE = true;
+
+                ImageView cureImage = (ImageView) FXMLUtils.getNodeById(pickedColor + "Cure", GameController._gamePane);
+                cureImage.setVisible(true);
 
                 MovementActionUtils.actionDone();
             }

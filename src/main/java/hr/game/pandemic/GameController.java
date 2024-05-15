@@ -185,7 +185,12 @@ public class GameController {
 //                players.getFirst().addCardToHand(cardTmp);
 //                playerCardPile.remove(cardTmp);
 //            }
-//            refreshPlayerHand(players.getFirst());
+            EventCard cardTmp = eventCards.stream()
+                    .filter(c -> c.getName().equals("Resilient Population"))
+                    .findAny()
+                    .orElse(null);
+            players.getFirst().addCardToHand(cardTmp);
+            refreshPlayerHand(players.getFirst());
 
             //Add epidemic cards to player card pile and shuffle
             for (int i = 0; i < GameState.DIFFICULTY + 3; i++) {
@@ -261,8 +266,6 @@ public class GameController {
             playerHandGrid.add(tmpButton, k%4, k/4);
         }
     }
-
-
 
     public static void drawInfectionCard() {
         CityCard drawnCard = infectionCardPile.getLast();

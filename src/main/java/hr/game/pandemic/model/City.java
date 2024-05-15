@@ -66,26 +66,35 @@ public class City {
 
     public boolean infect(String disease, int amount) {
         int n = 0;
-        System.out.println("Infecting " + name);
+
         if (this.diseases.contains(disease)) {
             for (String d : this.diseases) {
                 if (d.equals(disease))
+                {
                     n++;
+                }
+
             }
         }
 
         for (int i = 0; i < amount; i++) {
             if (n < 3){
-                this.diseases.add(disease);
-                if (disease.equals("yellow"))
-                    GameState.YELLOW_CUBES--;
-                if (disease.equals("red"))
-                    GameState.RED_CUBES--;
-                if (disease.equals("blue"))
-                    GameState.BLUE_CUBES--;
-                if (disease.equals("black"))
-                    GameState.BLACK_CUBES--;
-                n++;
+                if (!((GameState.BLACK_CURE && disease.equals("black")
+                        || GameState.BLUE_CURE && disease.equals("blue")
+                        || GameState.YELLOW_CURE && disease.equals("yellow")
+                        || GameState.RED_CURE && disease.equals("red")))){
+                    System.out.println("Infecting " + name);
+                    this.diseases.add(disease);
+                    if (disease.equals("yellow"))
+                        GameState.YELLOW_CUBES--;
+                    if (disease.equals("red"))
+                        GameState.RED_CUBES--;
+                    if (disease.equals("blue"))
+                        GameState.BLUE_CUBES--;
+                    if (disease.equals("black"))
+                        GameState.BLACK_CUBES--;
+                    n++;
+                }
             } else {
                 return true;
             }

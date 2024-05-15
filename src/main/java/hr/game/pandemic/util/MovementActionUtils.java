@@ -77,13 +77,14 @@ public class MovementActionUtils {
             FXMLUtils.moveInfectionRateToken();
         }
         //2. Infect
-        CityCard drawnCard = GameController.infectionCardPile.getFirst();
-        GameController.infectionCardPile.removeFirst();
+        CityCard drawnCard = GameController.infectionCardPile.getLast();
+        GameController.infectionCardPile.removeLast();
         GameController.infectionDiscardPile.add(drawnCard);
         GameController.infectCity(drawnCard.getName(), drawnCard.getColor(), 3);
         //3. Intensify
         Collections.shuffle(GameController.infectionDiscardPile);
         GameController.infectionCardPile.addAll(GameController.infectionDiscardPile);
+        GameController.infectionDiscardPile.clear();
     }
 
     public static void startPhaseThree() {

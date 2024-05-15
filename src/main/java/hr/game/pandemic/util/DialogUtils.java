@@ -485,7 +485,7 @@ public class DialogUtils {
 
                 tmpButton.getStyleClass().add("card" + tmpCard.getColor().substring(0, 1).toUpperCase() + tmpCard.getColor().substring(1));
 
-                pickGrid.add(tmpButton, i%8, i/6);
+                pickGrid.add(tmpButton, i%8, i/8);
             }
 
             dialog.setDialogPane(pickACardDialogPane);
