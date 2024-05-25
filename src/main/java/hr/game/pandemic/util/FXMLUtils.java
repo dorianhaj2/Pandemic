@@ -33,9 +33,9 @@ public class FXMLUtils {
         }
     }
     public static void moveInfectionRateToken() {
-        ImageView iv = (ImageView) getNodeById("infection" + GameState.INFECTION_RATE, GameController._gamePane);
+        ImageView iv = (ImageView) getNodeById("infectionRate" + GameState.INFECTION_RATE, GameController._gamePane);
         iv.setVisible(true);
-        ImageView ivPrev = (ImageView) getNodeById("infection" + (GameState.INFECTION_RATE - 1), GameController._gamePane);
+        ImageView ivPrev = (ImageView) getNodeById("infectionRate" + (GameState.INFECTION_RATE - 1), GameController._gamePane);
         ivPrev.setVisible(false);
     }
     public static void addPlayerToPlayersGrid(GridPane playersGrid, Integer playerNumber){
@@ -127,6 +127,7 @@ public class FXMLUtils {
         roleName = roleName.substring(0, 1).toUpperCase() + roleName.substring(1);
 
         Label roleLabel = (Label) getNodeById(player.getName().toLowerCase() + "Role", GameController._gamePane);
+        roleLabel.setText("");
         roleLabel.setText(roleName);
     }
     public static void updatePlayerLocation(Player player) {

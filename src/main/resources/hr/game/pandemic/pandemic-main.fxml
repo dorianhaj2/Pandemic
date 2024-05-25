@@ -140,37 +140,37 @@
                         <Image url="@images/outbreak_token.png" />
                      </image>
                   </ImageView>
-                  <ImageView fx:id="infection1" fitHeight="55.0" fitWidth="56.0" layoutX="964.0" layoutY="161.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="infectionRate1" fitHeight="55.0" fitWidth="56.0" layoutX="964.0" layoutY="161.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@images/infection_rate_token.png" />
                      </image>
                   </ImageView>
-                  <ImageView fx:id="infection2" fitHeight="55.0" fitWidth="56.0" layoutX="1017.0" layoutY="161.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                  <ImageView fx:id="infectionRate2" fitHeight="55.0" fitWidth="56.0" layoutX="1017.0" layoutY="161.0" pickOnBounds="true" preserveRatio="true" visible="false">
                      <image>
                         <Image url="@images/infection_rate_token.png" />
                      </image>
                   </ImageView>
-                  <ImageView fx:id="infection3" fitHeight="55.0" fitWidth="56.0" layoutX="1070.0" layoutY="161.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                  <ImageView fx:id="infectionRate3" fitHeight="55.0" fitWidth="56.0" layoutX="1070.0" layoutY="161.0" pickOnBounds="true" preserveRatio="true" visible="false">
                      <image>
                         <Image url="@images/infection_rate_token.png" />
                      </image>
                   </ImageView>
-                  <ImageView fx:id="infection4" fitHeight="55.0" fitWidth="56.0" layoutX="1123.0" layoutY="161.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                  <ImageView fx:id="infectionRate4" fitHeight="55.0" fitWidth="56.0" layoutX="1123.0" layoutY="161.0" pickOnBounds="true" preserveRatio="true" visible="false">
                      <image>
                         <Image url="@images/infection_rate_token.png" />
                      </image>
                   </ImageView>
-                  <ImageView fx:id="infection5" fitHeight="55.0" fitWidth="56.0" layoutX="1174.0" layoutY="161.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                  <ImageView fx:id="infectionRate5" fitHeight="55.0" fitWidth="56.0" layoutX="1174.0" layoutY="161.0" pickOnBounds="true" preserveRatio="true" visible="false">
                      <image>
                         <Image url="@images/infection_rate_token.png" />
                      </image>
                   </ImageView>
-                  <ImageView fx:id="infection6" fitHeight="55.0" fitWidth="56.0" layoutX="1227.0" layoutY="161.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                  <ImageView fx:id="infectionRate6" fitHeight="55.0" fitWidth="56.0" layoutX="1227.0" layoutY="161.0" pickOnBounds="true" preserveRatio="true" visible="false">
                      <image>
                         <Image url="@images/infection_rate_token.png" />
                      </image>
                   </ImageView>
-                  <ImageView fx:id="infection7" fitHeight="55.0" fitWidth="56.0" layoutX="1279.0" layoutY="161.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                  <ImageView fx:id="infectionRate7" fitHeight="55.0" fitWidth="56.0" layoutX="1279.0" layoutY="161.0" pickOnBounds="true" preserveRatio="true" visible="false">
                      <image>
                         <Image url="@images/infection_rate_token.png" />
                      </image>

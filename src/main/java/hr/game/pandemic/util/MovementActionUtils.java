@@ -58,33 +58,39 @@ public class MovementActionUtils {
 
     public static void startPhaseTwo() {
         boolean drawnEpidemic = GameController.playerDrawCard(ControlUtils.currentPlayer);
-        if (drawnEpidemic)
+        if (drawnEpidemic && !GameState.END_GAME)
             onEpidemicCardDraw();
         boolean drawnSecondEpidemic = GameController.playerDrawCard(ControlUtils.currentPlayer);
-        if (drawnSecondEpidemic) {
-            if (drawnEpidemic) {
-                //dodati play event? dialog ako itko od igraca ima event
+        if (!GameState.END_GAME) {
+            if (drawnSecondEpidemic) {
+                if (drawnEpidemic) {
+                    //dodati play event? dialog ako itko od igraca ima event
+                }
+                onEpidemicCardDraw();
             }
-            onEpidemicCardDraw();
+           GameController.checkIfPlayerHasTooManyCards(ControlUtils.currentPlayer);
+            startPhaseThree();
         }
-        startPhaseThree();
     }
 
     public static void onEpidemicCardDraw() {
-        //1. Increase
-        GameState.INFECTION_RATE++;
-        if (GameState.INFECTION_RATE < 8) {
-            FXMLUtils.moveInfectionRateToken();
+        if (!GameState.END_GAME) {
+            //1. Increase
+            GameState.INFECTION_RATE++;
+            if (GameState.INFECTION_RATE < 8) {
+                FXMLUtils.moveInfectionRateToken();
+            }
+            //2. Infect
+            CityCard drawnCard = GameController.infectionCardPile.getLast();
+            GameController.infectionCardPile.removeLast();
+            GameController.infectionDiscardPile.add(drawnCard);
+            GameController.infectCity(drawnCard.getName(), drawnCard.getColor(), 3);
+            //3. Intensify
+            Collections.shuffle(GameController.infectionDiscardPile);
+            GameController.infectionCardPile.addAll(GameController.infectionDiscardPile);
+            GameController.infectionDiscardPile.clear();
         }
-        //2. Infect
-        CityCard drawnCard = GameController.infectionCardPile.getLast();
-        GameController.infectionCardPile.removeLast();
-        GameController.infectionDiscardPile.add(drawnCard);
-        GameController.infectCity(drawnCard.getName(), drawnCard.getColor(), 3);
-        //3. Intensify
-        Collections.shuffle(GameController.infectionDiscardPile);
-        GameController.infectionCardPile.addAll(GameController.infectionDiscardPile);
-        GameController.infectionDiscardPile.clear();
+
     }
 
     public static void startPhaseThree() {
@@ -94,8 +100,11 @@ public class MovementActionUtils {
         if (amountOfInfectionCardsToDraw == 1)
             amountOfInfectionCardsToDraw++;
         for (int i = 0; i < amountOfInfectionCardsToDraw; i++) {
-            GameController.drawInfectionCard();
-            GameController.infectCity(GameController.infectionDiscardPile.getLast().getName(), GameController.infectionDiscardPile.getLast().getColor(), 1);
+            if (!GameState.END_GAME){
+                GameController.drawInfectionCard();
+                GameController.infectCity(GameController.infectionDiscardPile.getLast().getName(), GameController.infectionDiscardPile.getLast().getColor(), 1);
+
+            }
         }
         ControlUtils.passTurn();
     }

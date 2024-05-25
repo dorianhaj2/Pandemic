@@ -97,7 +97,7 @@ public class DialogUtils {
                 Button tmpButton = new Button(tmpCard.getName().substring(0, 1).toUpperCase() + tmpCard.getName().substring(1));
                 GridPane.setMargin(tmpButton, new Insets(10, 10, 10, 10));
                 tmpButton.setUserData(tmpCard);
-                tmpButton.setId(player.getName().toLowerCase() + tmpCard.getName());
+                tmpButton.setId(player.getName().toLowerCase().substring(0, player.getName().length()-1) + "Card" + player.getName().charAt(player.getName().length() - 1) + tmpCard.getName());
                 tmpButton.setCursor(Cursor.HAND);
                 tmpButton.setOnAction(DialogUtils::pickACardButtonClick);
                 GridPane.setHalignment(tmpButton, HPos.CENTER);
@@ -108,7 +108,7 @@ public class DialogUtils {
                     tmpButton.setUserData(tmpCard);
                     tmpButton.setOnAction(EventsUtils::onEventCardClick);
                 }
-                pickGrid.add(tmpButton, i%4, i/4);
+                pickGrid.add(tmpButton, i%5, i/5);
             }
 
             dialog.setDialogPane(pickACardDialogPane);

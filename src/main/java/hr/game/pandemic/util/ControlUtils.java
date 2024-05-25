@@ -225,8 +225,10 @@ public class ControlUtils {
     }
 
     public static void passTurn() {
-        GameState.NUMBER_OF_TURNS++;
-        showPhaseOneControls(GameController.players.get(GameState.getCurrentPlayerNumber() - 1));
+        if (!GameState.END_GAME){
+            GameState.NUMBER_OF_TURNS++;
+            showPhaseOneControls(GameController.players.get(GameState.getCurrentPlayerNumber() - 1));
+        }
     }
 
     public static void endTurn(Event event) {
@@ -245,7 +247,7 @@ public class ControlUtils {
     }
 
     public static void disableAllPlayerHandCards() {
-        List<Node> allActions = FXMLUtils.getNodesByIdStartsWith("player", GameController._gamePane);
+        List<Node> allActions = FXMLUtils.getNodesByIdStartsWith("playerCard", GameController._gamePane);
         for (Node node : allActions) {
             if (node instanceof Button b)
                 b.setDisable(true);
@@ -253,7 +255,7 @@ public class ControlUtils {
     }
 
     public static void enableAllPlayerHandCards() {
-        List<Node> allActions = FXMLUtils.getNodesByIdStartsWith("player", GameController._gamePane);
+        List<Node> allActions = FXMLUtils.getNodesByIdStartsWith("playerCard", GameController._gamePane);
         for (Node node : allActions) {
             if (node instanceof Button b)
                 b.setDisable(false);

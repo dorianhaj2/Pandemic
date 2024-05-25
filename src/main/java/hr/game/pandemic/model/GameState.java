@@ -20,6 +20,7 @@ public class GameState {
     public static boolean RED_ERADICATED;
     public static boolean BLUE_ERADICATED;
     public static boolean BLACK_ERADICATED;
+    public static boolean END_GAME;
 
     public static int getCurrentPlayerNumber() {
         return (GameState.NUMBER_OF_TURNS % GameState.NUMBER_OF_PLAYERS) + 1;

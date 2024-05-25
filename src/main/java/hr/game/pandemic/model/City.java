@@ -1,5 +1,7 @@
 package hr.game.pandemic.model;
 
+import hr.game.pandemic.GameController;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,9 +98,16 @@ public class City {
                     n++;
                 }
             } else {
+                if (GameState.YELLOW_CUBES < 0 || GameState.BLACK_CUBES < 0 || GameState.BLUE_CUBES < 0 || GameState.RED_CUBES < 0) {
+                    GameController.endGame(false, "No " + disease + " disease cubes left!");
+                    return false;
+                }
+
                 return true;
             }
         }
+        if (GameState.YELLOW_CUBES < 0 || GameState.BLACK_CUBES < 0 || GameState.BLUE_CUBES < 0 || GameState.RED_CUBES < 0)
+            GameController.endGame(false, "No " + disease + " disease cubes left!");
         return false;
     }
 

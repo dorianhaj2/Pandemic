@@ -4,6 +4,7 @@ import hr.game.pandemic.GameController;
 import hr.game.pandemic.model.*;
 import javafx.event.Event;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
@@ -52,6 +53,8 @@ public class OtherActionUtils {
         if (color.equals("yellow")){
             if (GameState.YELLOW_CURE){
                 city.cureAllOfDisease(color);
+                if (GameState.YELLOW_CUBES == 24)
+                    setDiseaseEradicated(color);
             } else {
                 city.cureOneOfDisease(color);
             }
@@ -59,6 +62,8 @@ public class OtherActionUtils {
         if (color.equals("red")){
             if (GameState.RED_CURE){
                 city.cureAllOfDisease(color);
+                if (GameState.RED_CUBES == 24)
+                    setDiseaseEradicated(color);
             } else {
                 city.cureOneOfDisease(color);
             }
@@ -66,6 +71,8 @@ public class OtherActionUtils {
         if (color.equals("blue")){
             if (GameState.BLUE_CURE){
                 city.cureAllOfDisease(color);
+                if (GameState.BLACK_CUBES == 24)
+                    setDiseaseEradicated(color);
             } else {
                 city.cureOneOfDisease(color);
             }
@@ -73,6 +80,8 @@ public class OtherActionUtils {
         if (color.equals("black")){
             if (GameState.BLACK_CURE){
                 city.cureAllOfDisease(color);
+                if (GameState.BLACK_CUBES == 24)
+                    setDiseaseEradicated(color);
             } else {
                 city.cureOneOfDisease(color);
             }
@@ -80,6 +89,11 @@ public class OtherActionUtils {
         FXMLUtils.refreshCityButtonText(city);
         FXMLUtils.refreshDiseaseCubeCount();
         MovementActionUtils.actionDone();
+    }
+
+    public static void setDiseaseEradicated(String color) {
+        ImageView cureImageView = (ImageView) FXMLUtils.getNodeById(color + "Cure", GameController._gamePane);
+        cureImageView.setImage(new Image("images\\" + color +"_eradicated.png"));
     }
 
     public static void onShareKnowledgeButtonClick(Event event) {

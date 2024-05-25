@@ -7,7 +7,11 @@ import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import org.json.simple.*;
 import org.json.simple.parser.JSONParser;
@@ -16,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+
 
 public class GameController {
     @FXML
@@ -133,16 +138,41 @@ public class GameController {
             GameState.RED_ERADICATED = false;
             GameState.BLUE_ERADICATED = false;
             GameState.BLACK_ERADICATED = false;
+            GameState.END_GAME = false;
+
+            for (Node node : FXMLUtils.getNodesByIdStartsWith("outbreak", _gamePane)) {
+                ImageView iv = (ImageView) node;
+                iv.setVisible(false);
+            }
+
+            for (Node node : FXMLUtils.getNodesByIdStartsWith("infectionRate", _gamePane)) {
+                ImageView iv = (ImageView) node;
+                iv.setVisible(false);
+            }
+            ImageView ivInfectionRate1 = (ImageView) FXMLUtils.getNodeById("infectionRate1", gamePane);
+            ivInfectionRate1.setVisible(true);
 
             GridPane playersGrid = (GridPane) FXMLUtils.getNodeById("playersGridPane", _gamePane);
+            List<Node> nodesToRemove = new ArrayList<>();
+            for (Node node : playersGrid.getChildren()) {
+                if (node.getId().startsWith("player"))
+                    nodesToRemove.add(node);
+            }
+            playersGrid.getChildren().removeAll(nodesToRemove);
             for (int i = 0; i < GameState.NUMBER_OF_PLAYERS; i++) {
                 FXMLUtils.addPlayerToPlayersGrid(playersGrid, i+1);
+            }
+
+            for (City city : cities) {
+                city.setDiseases(new ArrayList<>());
+                Label cityDiseaseLabel = (Label) FXMLUtils.getNodeById(city.getName() + "Diseases", _gamePane);
+                cityDiseaseLabel.setText("");
             }
 
             List<Role> roles = new ArrayList<>(List.of(Role.values()));
             Collections.shuffle(roles);
 
-            //Add players to list
+            //Add new players to list
             players = new ArrayList<>();
             for (int i = 0; i < GameState.NUMBER_OF_PLAYERS; i++) {
                 players.add(new Player("Player" + (i+1), roles.getLast()));
@@ -185,12 +215,12 @@ public class GameController {
 //                players.getFirst().addCardToHand(cardTmp);
 //                playerCardPile.remove(cardTmp);
 //            }
-            EventCard cardTmp = eventCards.stream()
-                    .filter(c -> c.getName().equals("Resilient Population"))
-                    .findAny()
-                    .orElse(null);
-            players.getFirst().addCardToHand(cardTmp);
-            refreshPlayerHand(players.getFirst());
+//            EventCard cardTmp = eventCards.stream()
+//                    .filter(c -> c.getName().equals("Resilient Population"))
+//                    .findAny()
+//                    .orElse(null);
+//            players.getFirst().addCardToHand(cardTmp);
+//            refreshPlayerHand(players.getFirst());
 
             //Add epidemic cards to player card pile and shuffle
             for (int i = 0; i < GameState.DIFFICULTY + 3; i++) {
@@ -211,14 +241,19 @@ public class GameController {
     }
 
     public static boolean playerDrawCard(Player player) {
-        if (playerCardPile.getLast().getName().equals("Epidemic")) {
+        if (playerCardPile.isEmpty())
+            endGame(false, "No player cards left to draw!");
+        else {
+            if (playerCardPile.getLast().getName().equals("Epidemic")) {
+                playerCardPile.removeLast();
+                return true;
+            }
+            player.addCardToHand(playerCardPile.getLast());
             playerCardPile.removeLast();
-            return true;
+
+            refreshPlayerHand(player);
+            return false;
         }
-        player.addCardToHand(playerCardPile.getLast());
-        playerCardPile.removeLast();
-        checkIfPlayerHasTooManyCards(player);
-        refreshPlayerHand(player);
         return false;
     }
 
@@ -230,7 +265,7 @@ public class GameController {
     }
 
     public static void checkIfPlayerHasTooManyCards(Player player) {
-        if (player.getHand().size() > 7) {
+        while (player.getHand().size() > 7) {
             Card pickedCard = DialogUtils.showPickACardDialog(player, "city event", "Pick a city card to discard or event card to play.");
             if (pickedCard != null) {
                 if (Character.isUpperCase(pickedCard.getName().charAt(0))) {
@@ -241,8 +276,8 @@ public class GameController {
                 }
             }
         }
-        if (player.getHand().size() > 7)
-            checkIfPlayerHasTooManyCards(player);
+//        if (player.getHand().size() > 7)
+//            checkIfPlayerHasTooManyCards(player);
     }
 
     public static void refreshPlayerHand(Player player) {
@@ -253,7 +288,8 @@ public class GameController {
             Button tmpButton = new Button(tmpCard.getName().substring(0, 1).toUpperCase() + tmpCard.getName().substring(1));
             GridPane.setMargin(tmpButton, new Insets(10, 10, 10, 10));
             tmpButton.setUserData(tmpCard);
-            tmpButton.setId(player.getName().toLowerCase() + tmpCard.getName());
+            
+            tmpButton.setId(player.getName().toLowerCase().substring(0, player.getName().length()-1) + "Card" + player.getName().charAt(player.getName().length() - 1) + tmpCard.getName());
             tmpButton.setCursor(Cursor.HAND);
             GridPane.setHalignment(tmpButton, HPos.CENTER);
             if (tmpCard instanceof CityCard cc) {
@@ -278,7 +314,7 @@ public class GameController {
         List<String> citiesToInfect = CityGraph.cityGraph.get(sourceCityName);
 
         for (String s : citiesToInfect) {
-            if (!outbreaksInCitiesInCurrentChain.contains(s)) {
+            if (!outbreaksInCitiesInCurrentChain.contains(s) && !GameState.END_GAME) {
                 infectCity(s, diseaseColor, 1);
             }
         }
@@ -294,7 +330,12 @@ public class GameController {
                     outbreaksInCitiesInCurrentChain.add(cityName);
                     GameState.OUTBREAK_COUNTER++;
                     FXMLUtils.moveOutbreakToken();
-                    infectAdjacentCities(cityName, diseaseColor);
+                    if (GameState.OUTBREAK_COUNTER == 8)
+                        endGame(false, "Outbreak marker reached last space of the Outbreaks Track!");
+                    else {
+                        infectAdjacentCities(cityName, diseaseColor);
+                    }
+
                 }
             }
         }
@@ -329,6 +370,22 @@ public class GameController {
             discardPileButton.getStyleClass().add("card" + topCard.getColor().substring(0, 1).toUpperCase() + topCard.getColor().substring(1));
             discardPileButton.setText(topCard.getName().substring(0, 1).toUpperCase() + topCard.getName().substring(1));
         }
+    }
+
+    public static void endGame(boolean gameWin, String loseReason) {
+        GameState.END_GAME = true;
+        ControlUtils.disableAllOtherControls("");
+        ControlUtils.disableAllPlayerHandCards();
+        ControlUtils.disableAllCityButtons();
+        Alert endGameAlert = new Alert(Alert.AlertType.INFORMATION);
+        if (gameWin) {
+            endGameAlert.setTitle("Congratulations!");
+            endGameAlert.setHeaderText("You won!");
+        } else {
+            endGameAlert.setTitle("Game over!");
+            endGameAlert.setHeaderText(loseReason);
+        }
+        endGameAlert.showAndWait();
     }
 
 }
