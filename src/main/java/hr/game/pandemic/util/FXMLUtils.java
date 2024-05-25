@@ -1,6 +1,5 @@
 package hr.game.pandemic.util;
 
-import com.google.common.base.CaseFormat;
 import hr.game.pandemic.GameController;
 import hr.game.pandemic.model.*;
 import javafx.geometry.Insets;

@@ -29,6 +29,7 @@ import java.util.*;
 public class GameController {
     @FXML
     private Pane gamePane;
+    private static boolean SETUP;
     public static Pane _gamePane;
     public static List<CityCard> infectionCardPile;
     public static List<CityCard> infectionDiscardPile;
@@ -143,6 +144,7 @@ public class GameController {
             GameState.BLUE_ERADICATED = false;
             GameState.BLACK_ERADICATED = false;
             GameState.END_GAME = false;
+            SETUP = true;
 
             for (Node node : FXMLUtils.getNodesByIdStartsWith("outbreak", _gamePane)) {
                 ImageView iv = (ImageView) node;
@@ -240,6 +242,7 @@ public class GameController {
             }
             Collections.shuffle(playerCardPile);
 
+
             //Start of game infections
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
@@ -247,7 +250,7 @@ public class GameController {
                     infectCity(infectionDiscardPile.getLast().getName(), infectionDiscardPile.getLast().getColor(), 3 - i);
                 }
             }
-
+            SETUP = false;
             ControlUtils.showPhaseOneControls(players.getFirst());
         }
     }
@@ -335,19 +338,35 @@ public class GameController {
     public static void infectCity(String cityName, String diseaseColor, int amount) {
         for(City cityToInfect : cities) {
             if (cityToInfect.getName().equals(cityName)) {
-                boolean toOutbreak = cityToInfect.infect(diseaseColor, amount);
-                FXMLUtils.refreshCityButtonText(cityToInfect);
-                FXMLUtils.refreshDiseaseCubeCount();
-                if (toOutbreak) {
-                    outbreaksInCitiesInCurrentChain.add(cityName);
-                    GameState.OUTBREAK_COUNTER++;
-                    FXMLUtils.moveOutbreakToken();
-                    if (GameState.OUTBREAK_COUNTER == 8)
-                        endGame(false, "Outbreak marker reached last space of the Outbreaks Track!");
-                    else {
-                        infectAdjacentCities(cityName, diseaseColor);
+                QuarantineSpecialist potentialQuarantineSpecialistPlayer = null;
+                for (Player player : players) {
+                    if (player instanceof QuarantineSpecialist) {
+                        potentialQuarantineSpecialistPlayer = (QuarantineSpecialist) player;
                     }
-
+                }
+                boolean toInfect = true;
+                if (!SETUP) {
+                    if (potentialQuarantineSpecialistPlayer != null) {
+                        if (potentialQuarantineSpecialistPlayer.getCurrentCity().equals(cityName)
+                                || CityGraph.cityGraph.get(potentialQuarantineSpecialistPlayer.getCurrentCity()).contains(cityName)) {
+                            toInfect = false;
+                        }
+                    }
+                }
+                if (toInfect) {
+                    boolean toOutbreak = cityToInfect.infect(diseaseColor, amount);
+                    FXMLUtils.refreshCityButtonText(cityToInfect);
+                    FXMLUtils.refreshDiseaseCubeCount();
+                    if (toOutbreak) {
+                        outbreaksInCitiesInCurrentChain.add(cityName);
+                        GameState.OUTBREAK_COUNTER++;
+                        FXMLUtils.moveOutbreakToken();
+                        if (GameState.OUTBREAK_COUNTER == 8)
+                            endGame(false, "Outbreak marker reached last space of the Outbreaks Track!");
+                        else {
+                            infectAdjacentCities(cityName, diseaseColor);
+                        }
+                    }
                 }
             }
         }
