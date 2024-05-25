@@ -1,6 +1,10 @@
 package hr.game.pandemic;
 
 import hr.game.pandemic.model.*;
+import hr.game.pandemic.model.roles.Medic;
+import hr.game.pandemic.model.roles.QuarantineSpecialist;
+import hr.game.pandemic.model.roles.Researcher;
+import hr.game.pandemic.model.roles.Scientist;
 import hr.game.pandemic.util.*;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -175,7 +179,15 @@ public class GameController {
             //Add new players to list
             players = new ArrayList<>();
             for (int i = 0; i < GameState.NUMBER_OF_PLAYERS; i++) {
-                players.add(new Player("Player" + (i+1), roles.getLast()));
+                if (roles.getLast().equals(Role.MEDIC)) {
+                    players.add(new Medic("Player" + (i+1)));
+                } else if (roles.getLast().equals(Role.QUARANTINE_SPECIALIST)) {
+                    players.add(new QuarantineSpecialist("Player" + (i+1)));
+                } else if (roles.getLast().equals(Role.RESEARCHER)) {
+                    players.add(new Researcher("Player" + (i+1)));
+                } else if (roles.getLast().equals(Role.SCIENTIST)) {
+                    players.add(new Scientist("Player" + (i+1)));
+                }
                 roles.removeLast();
                 FXMLUtils.updatePlayerLocation(players.get(i));
                 FXMLUtils.updatePlayerRole(players.get(i));

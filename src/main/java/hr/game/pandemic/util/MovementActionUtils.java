@@ -2,6 +2,7 @@ package hr.game.pandemic.util;
 
 import hr.game.pandemic.GameController;
 import hr.game.pandemic.model.*;
+import hr.game.pandemic.model.roles.Medic;
 import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -9,6 +10,7 @@ import javafx.scene.control.Label;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class MovementActionUtils {
 
@@ -29,6 +31,22 @@ public class MovementActionUtils {
     public static void moveCurrentPlayerToCity(String city) {
         ControlUtils.currentPlayer.setPreviousCity(ControlUtils.currentPlayer.getCurrentCity());
         ControlUtils.currentPlayer.setCurrentCity(city);
+        Optional<City> currentCityOptional = GameController.cities.stream()
+                .filter(c -> c.getName().equals(ControlUtils.currentPlayer.getCurrentCity()))
+                .findAny();
+        if (ControlUtils.currentPlayer instanceof Medic) {
+            if (currentCityOptional.isPresent()) {
+                City currentCity = currentCityOptional.get();
+                if (GameState.RED_CURE)
+                    currentCity.cureAllOfDisease("red");
+                if (GameState.YELLOW_CURE)
+                    currentCity.cureAllOfDisease("yellow");
+                if (GameState.BLUE_CURE)
+                    currentCity.cureAllOfDisease("blue");
+                if (GameState.BLACK_CURE)
+                    currentCity.cureAllOfDisease("black");
+            }
+        }
         FXMLUtils.updatePlayerLocation(ControlUtils.currentPlayer);
     }
 

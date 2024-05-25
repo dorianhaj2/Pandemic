@@ -1,5 +1,6 @@
 package hr.game.pandemic.util;
 
+import com.google.common.base.CaseFormat;
 import hr.game.pandemic.GameController;
 import hr.game.pandemic.model.*;
 import javafx.geometry.Insets;
@@ -123,8 +124,7 @@ public class FXMLUtils {
         return result;
     }
     public static void updatePlayerRole(Player player) {
-        String roleName = player.getRole().name().replace("_", " ").toLowerCase();
-        roleName = roleName.substring(0, 1).toUpperCase() + roleName.substring(1);
+        String roleName = player.getRoleName();
 
         Label roleLabel = (Label) getNodeById(player.getName().toLowerCase() + "Role", GameController._gamePane);
         roleLabel.setText("");
@@ -155,8 +155,9 @@ public class FXMLUtils {
             List<File> files = getAllFilesFromResource("hr/game/pandemic/images/roles/pawns/");
 
             for (File f : files) {
-                if (f.getName().equals(player.getRole().name().toLowerCase() + "_pawn.png"))
-                    cityPlayerImage.setImage(new Image(new FileInputStream(f))); //"hr/game/pandemic/images/roles/pawns/" + player.getRole().name().toLowerCase() + "_pawn.png"))
+                //if (f.getName().equals(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, player.getRoleName().replaceAll(" ", "") + "_pawn.png")))
+                if (f.getName().equals(player.getRoleName().toLowerCase().replaceAll(" ", "_") + "_pawn.png"))
+                    cityPlayerImage.setImage(new Image(new FileInputStream(f)));
             }
             cityPlayerImage.setFitWidth(20);
             cityPlayerImage.setFitHeight(20);

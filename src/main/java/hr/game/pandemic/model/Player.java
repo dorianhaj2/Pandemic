@@ -9,7 +9,6 @@ public class Player {
     private List<Card> hand;
     private String previousCity;
     private String currentCity;
-    private Role role;
 
     public Player() {
     }
@@ -19,14 +18,6 @@ public class Player {
         this.hand = new ArrayList<>();
         this.currentCity = "atlanta";
         this.previousCity = "";
-    }
-
-    public Player(String name,  Role role) {
-        this.name = name;
-        this.hand = new ArrayList<>();
-        this.currentCity = "atlanta";
-        this.previousCity = "";
-        this.role = role;
     }
 
     public Player(String name, List<Card> hand, String currentCity) {
@@ -72,19 +63,15 @@ public class Player {
         this.currentCity = currentCity;
     }
 
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
     public String getPreviousCity() {
         return previousCity;
     }
 
     public void setPreviousCity(String previousCity) {
         this.previousCity = previousCity;
+    }
+
+    public String getRoleName() {
+        return "Player";
     }
 }
