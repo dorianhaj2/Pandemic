@@ -81,9 +81,6 @@ public class MovementActionUtils {
         boolean drawnSecondEpidemic = GameController.playerDrawCard(ControlUtils.currentPlayer);
         if (!GameState.END_GAME) {
             if (drawnSecondEpidemic) {
-                if (drawnEpidemic) {
-                    //dodati play event? dialog ako itko od igraca ima event
-                }
                 onEpidemicCardDraw();
             }
            GameController.checkIfPlayerHasTooManyCards(ControlUtils.currentPlayer);

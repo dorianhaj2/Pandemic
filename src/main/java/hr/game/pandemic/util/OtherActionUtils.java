@@ -229,6 +229,9 @@ public class OtherActionUtils {
                 ImageView cureImage = (ImageView) FXMLUtils.getNodeById(pickedColor + "Cure", GameController._gamePane);
                 cureImage.setVisible(true);
 
+                if (GameState.YELLOW_CURE && GameState.BLUE_CURE && GameState.RED_CURE && GameState.BLACK_CURE)
+                    GameController.endGame(true, "");
+
                 MovementActionUtils.actionDone();
             }
         }

@@ -226,22 +226,6 @@ public class GameController {
                     playerDrawCard(players.get(i));
                 }
             }
-//          Dodaj 5 plavih karica prvom igraču
-//            for (int i = 0; i < 5; i++) {
-//                Card cardTmp = playerCardPile.stream()
-//                        .filter(c -> c.getClass().equals(CityCard.class))
-//                        .filter(c -> ((CityCard) c).getColor().equals("blue"))
-//                        .findAny()
-//                        .orElse(null);
-//                players.getFirst().addCardToHand(cardTmp);
-//                playerCardPile.remove(cardTmp);
-//            }
-//            EventCard cardTmp = eventCards.stream()
-//                    .filter(c -> c.getName().equals("Resilient Population"))
-//                    .findAny()
-//                    .orElse(null);
-//            players.getFirst().addCardToHand(cardTmp);
-//            refreshPlayerHand(players.getFirst());
 
             //Add epidemic cards to player card pile and shuffle
             for (int i = 0; i < GameState.DIFFICULTY + 3; i++) {
