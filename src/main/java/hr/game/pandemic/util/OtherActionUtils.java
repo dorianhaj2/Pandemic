@@ -5,7 +5,6 @@ import hr.game.pandemic.model.*;
 import hr.game.pandemic.model.roles.Medic;
 import hr.game.pandemic.model.roles.Researcher;
 import javafx.event.Event;
-import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -61,8 +60,8 @@ public class OtherActionUtils {
         if (cityOptional.isPresent()) {
             City city = cityOptional.get();
 
-            if (color.equals("yellow")){
-                if (GameState.YELLOW_CURE || ControlUtils.currentPlayer instanceof Medic){
+            if (color.equals("yellow")) {
+                if (GameState.YELLOW_CURE || ControlUtils.currentPlayer instanceof Medic) {
                     city.cureAllOfDisease(color);
                     if (GameState.YELLOW_CUBES == 24)
                         setDiseaseEradicated(color);
@@ -70,8 +69,8 @@ public class OtherActionUtils {
                     city.cureOneOfDisease(color);
                 }
             }
-            if (color.equals("red")){
-                if (GameState.RED_CURE || ControlUtils.currentPlayer instanceof Medic){
+            if (color.equals("red")) {
+                if (GameState.RED_CURE || ControlUtils.currentPlayer instanceof Medic) {
                     city.cureAllOfDisease(color);
                     if (GameState.RED_CUBES == 24)
                         setDiseaseEradicated(color);
@@ -79,8 +78,8 @@ public class OtherActionUtils {
                     city.cureOneOfDisease(color);
                 }
             }
-            if (color.equals("blue")){
-                if (GameState.BLUE_CURE || ControlUtils.currentPlayer instanceof Medic){
+            if (color.equals("blue")) {
+                if (GameState.BLUE_CURE || ControlUtils.currentPlayer instanceof Medic) {
                     city.cureAllOfDisease(color);
                     if (GameState.BLACK_CUBES == 24)
                         setDiseaseEradicated(color);
@@ -88,8 +87,8 @@ public class OtherActionUtils {
                     city.cureOneOfDisease(color);
                 }
             }
-            if (color.equals("black")){
-                if (GameState.BLACK_CURE || ControlUtils.currentPlayer instanceof Medic){
+            if (color.equals("black")) {
+                if (GameState.BLACK_CURE || ControlUtils.currentPlayer instanceof Medic) {
                     city.cureAllOfDisease(color);
                     if (GameState.BLACK_CUBES == 24)
                         setDiseaseEradicated(color);
@@ -105,7 +104,7 @@ public class OtherActionUtils {
 
     public static void setDiseaseEradicated(String color) {
         ImageView cureImageView = (ImageView) FXMLUtils.getNodeById(color + "Cure", GameController._gamePane);
-        cureImageView.setImage(new Image("images\\" + color +"_eradicated.png"));
+        cureImageView.setImage(new Image("images\\" + color + "_eradicated.png"));
     }
 
     public static void onShareKnowledgeButtonClick(Event event) {
@@ -153,7 +152,7 @@ public class OtherActionUtils {
                     }
                 }
             }
-            if (toTake || (!currentPlayerHasCurrentCityCardOrIsAResearcher && (anotherPlayerIsAResearcher || anotherPlayerHasCurrentCityCard))){
+            if (toTake || (!currentPlayerHasCurrentCityCardOrIsAResearcher && (anotherPlayerIsAResearcher || anotherPlayerHasCurrentCityCard))) {
                 Card cardToTake = null;
                 playersOnCurrentCity.remove(ControlUtils.currentPlayer);
                 Player playerToTakeFrom = DialogUtils.showPickAnotherPlayerDialog("Choose a player to take a city card from.", false, playersOnCurrentCity);
@@ -189,18 +188,18 @@ public class OtherActionUtils {
     public static void onDiscoverACureButtonClick(Event event) {
 
         String colorsToShow = "";
-        if (ControlUtils.yellowCount > 4)
+        if (ControlUtils.yellowCount > 4 || (ControlUtils.yellowCount > 3 && ControlUtils.currentPlayer instanceof Researcher))
             colorsToShow += " yellow";
-        if (ControlUtils.blueCount > 4)
+        if (ControlUtils.blueCount > 4 || (ControlUtils.blueCount > 3 && ControlUtils.currentPlayer instanceof Researcher))
             colorsToShow += " blue";
-        if (ControlUtils.redCount > 4)
+        if (ControlUtils.redCount > 4 || (ControlUtils.redCount > 3 && ControlUtils.currentPlayer instanceof Researcher))
             colorsToShow += " red";
-        if (ControlUtils.blackCount > 4)
+        if (ControlUtils.blackCount > 4 || (ControlUtils.blackCount > 3 && ControlUtils.currentPlayer instanceof Researcher))
             colorsToShow += " black";
 
         String pickedColor = DialogUtils.showPickAColorDialog(colorsToShow);
 
-        if (pickedColor != null){
+        if (pickedColor != null) {
             List<CityCard> cardsToDiscard = new ArrayList<>();
             Player tmpPlayer = new Player(ControlUtils.currentPlayer.getName(), new ArrayList<>(ControlUtils.currentPlayer.getHand()), ControlUtils.currentPlayer.getCurrentCity());
 
@@ -217,7 +216,7 @@ public class OtherActionUtils {
             }
 
             if (k > 4) {
-                for (CityCard c : cardsToDiscard){
+                for (CityCard c : cardsToDiscard) {
                     GameController.playerDiscardCard(ControlUtils.currentPlayer, c);
                 }
                 switch (pickedColor) {
