@@ -37,7 +37,7 @@ public class GameController {
     public static List<Card> playerDiscardPile;
     private static List<EventCard> eventCards = new ArrayList<>();
     private static List<CityCard> cityCards = new ArrayList<>();
-    public static List<Player> players;
+    public static List<Player> players = new ArrayList<>();
     public static List<City> cities = new ArrayList<>();
     public static List<List<String>> citiesColors = new ArrayList<>();
     private static List<String> outbreaksInCitiesInCurrentChain = new ArrayList<>();
@@ -178,6 +178,13 @@ public class GameController {
             List<Role> roles = new ArrayList<>(List.of(Role.values()));
             Collections.shuffle(roles);
 
+            if (!players.isEmpty()) {
+                for (Player p : players) {
+                    p.setPreviousCity(p.getCurrentCity());
+                    p.setCurrentCity("");
+                    FXMLUtils.updatePlayerLocation(p);
+                }
+            }
             //Add new players to list
             players = new ArrayList<>();
             for (int i = 0; i < GameState.NUMBER_OF_PLAYERS; i++) {

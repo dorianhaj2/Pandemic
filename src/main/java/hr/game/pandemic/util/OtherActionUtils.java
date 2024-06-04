@@ -3,7 +3,9 @@ package hr.game.pandemic.util;
 import hr.game.pandemic.GameController;
 import hr.game.pandemic.model.*;
 import hr.game.pandemic.model.roles.Medic;
+import hr.game.pandemic.model.roles.Researcher;
 import javafx.event.Event;
+import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -108,43 +110,80 @@ public class OtherActionUtils {
 
     public static void onShareKnowledgeButtonClick(Event event) {
         if (event.getSource() instanceof Button b) {
-            Player playerWithCurrentCityCard = (Player) b.getUserData();
-            if (playerWithCurrentCityCard == ControlUtils.currentPlayer){
-                Player pickedPlayer = DialogUtils.showPickAnotherPlayerDialog("Pick a player to give current city card to.", true);
-                if (pickedPlayer != null) {
-                    Optional<Card> cardToGiveOptional = ControlUtils.currentPlayer.getHand().stream()
-                            .filter(card -> card.getName().equals(ControlUtils.currentPlayer.getCurrentCity()))
-                            .findAny();
-                    if (cardToGiveOptional.isPresent()) {
-                        Card cardToGive = cardToGiveOptional.get();
-                        pickedPlayer.addCardToHand(cardToGive);
-                        ControlUtils.currentPlayer.removeCardFromHand(cardToGive);
-                        GameController.checkIfPlayerHasTooManyCards(pickedPlayer);
-                        GameController.refreshPlayerHand(pickedPlayer);
-                        GameController.refreshPlayerHand(ControlUtils.currentPlayer);
-                        MovementActionUtils.actionDone();
-                    }
+            List<Player> playersOnCurrentCity = (List<Player>) b.getUserData();
+            boolean currentPlayerHasCurrentCityCardOrIsAResearcher = false;
+            boolean anotherPlayerHasCurrentCityCard = false;
+            boolean anotherPlayerIsAResearcher = false;
+            boolean toTake = false;
+            for (Player p : playersOnCurrentCity) {
+                if (p == ControlUtils.currentPlayer)
+                    currentPlayerHasCurrentCityCardOrIsAResearcher = true;
+                else if (p instanceof Researcher)
+                    anotherPlayerIsAResearcher = true;
+                else
+                    anotherPlayerHasCurrentCityCard = true;
+            }
+            if (currentPlayerHasCurrentCityCardOrIsAResearcher) {
+                if ((ControlUtils.currentPlayer instanceof Researcher && anotherPlayerHasCurrentCityCard) || (!(ControlUtils.currentPlayer instanceof Researcher) && anotherPlayerIsAResearcher)) {
+                    toTake = DialogUtils.showTakeCardOrGiveCardDialog();
                 }
-            } else {
-                boolean toTake = DialogUtils.showTakeCardConfirmationDialog(playerWithCurrentCityCard);
-                if (toTake) {
-                    Optional<Card> cardToGiveOptional = playerWithCurrentCityCard.getHand().stream()
-                            .filter(card -> card.getName().equals(ControlUtils.currentPlayer.getCurrentCity()))
-                            .findAny();
-                    if (cardToGiveOptional.isPresent()) {
-                        Card cardToGive = cardToGiveOptional.get();
+                if (!toTake) {
+                    Player pickedPlayer = DialogUtils.showPickAnotherPlayerDialog("Pick a player to give a city card to.", true);
+                    if (pickedPlayer != null) {
+                        Card cardToGive = null;
+                        if (ControlUtils.currentPlayer instanceof Researcher) {
+                            cardToGive = DialogUtils.showPickACardDialog(ControlUtils.currentPlayer, "city", "Pick a city card to give.");
+                        } else {
+                            Optional<Card> cardToGiveOptional = ControlUtils.currentPlayer.getHand().stream()
+                                    .filter(card -> card.getName().equals(ControlUtils.currentPlayer.getCurrentCity()))
+                                    .findAny();
+                            if (cardToGiveOptional.isPresent()) {
+                                cardToGive = cardToGiveOptional.get();
+                            }
+                        }
 
-                        ControlUtils.currentPlayer.addCardToHand(cardToGive);
-                        playerWithCurrentCityCard.removeCardFromHand(cardToGive);
-                        GameController.checkIfPlayerHasTooManyCards(ControlUtils.currentPlayer);
-                        GameController.refreshPlayerHand(playerWithCurrentCityCard);
-                        GameController.refreshPlayerHand(ControlUtils.currentPlayer);
-                        MovementActionUtils.actionDone();
+                        if (cardToGive != null) {
+                            pickedPlayer.addCardToHand(cardToGive);
+                            ControlUtils.currentPlayer.removeCardFromHand(cardToGive);
+                            GameController.checkIfPlayerHasTooManyCards(pickedPlayer);
+                            GameController.refreshPlayerHand(pickedPlayer);
+                            GameController.refreshPlayerHand(ControlUtils.currentPlayer);
+                            MovementActionUtils.actionDone();
+                        }
                     }
                 }
             }
-        }
+            if (toTake || (!currentPlayerHasCurrentCityCardOrIsAResearcher && (anotherPlayerIsAResearcher || anotherPlayerHasCurrentCityCard))){
+                Card cardToTake = null;
+                playersOnCurrentCity.remove(ControlUtils.currentPlayer);
+                Player playerToTakeFrom = DialogUtils.showPickAnotherPlayerDialog("Choose a player to take a city card from.", false, playersOnCurrentCity);
 
+                if (playerToTakeFrom instanceof Researcher) {
+                    cardToTake = DialogUtils.showPickACardDialog(playerToTakeFrom, "city", "Choose a card to take from the researcher.");
+                } else {
+                    if (playerToTakeFrom != null) {
+                        boolean toTake2 = DialogUtils.showTakeCardConfirmationDialog(playerToTakeFrom);
+                        if (toTake2) {
+                            Optional<Card> cardToTakeOptional = playerToTakeFrom.getHand().stream()
+                                    .filter(card -> card.getName().equals(ControlUtils.currentPlayer.getCurrentCity()))
+                                    .findAny();
+                            if (cardToTakeOptional.isPresent()) {
+                                cardToTake = cardToTakeOptional.get();
+                            }
+                        }
+                    }
+                }
+                if (cardToTake != null) {
+                    ControlUtils.currentPlayer.addCardToHand(cardToTake);
+                    playerToTakeFrom.removeCardFromHand(cardToTake);
+                    GameController.checkIfPlayerHasTooManyCards(ControlUtils.currentPlayer);
+                    GameController.refreshPlayerHand(playerToTakeFrom);
+                    GameController.refreshPlayerHand(ControlUtils.currentPlayer);
+                    MovementActionUtils.actionDone();
+                }
+                playersOnCurrentCity.add(ControlUtils.currentPlayer);
+            }
+        }
     }
 
     public static void onDiscoverACureButtonClick(Event event) {

@@ -130,43 +130,45 @@ public class FXMLUtils {
         roleLabel.setText(roleName);
     }
     public static void updatePlayerLocation(Player player) {
-        String cityName = player.getCurrentCity().substring(0, 1).toUpperCase() + player.getCurrentCity().substring(1);
-        List<Integer> indexes = new ArrayList<>();
+        if (!player.getCurrentCity().isEmpty()) {
+            String cityName = player.getCurrentCity().substring(0, 1).toUpperCase() + player.getCurrentCity().substring(1);
+            List<Integer> indexes = new ArrayList<>();
 
-        for (int i = 1; i < cityName.length(); i++) {
-            if (Character.isUpperCase(cityName.charAt(i))) {
-                indexes.add(i);
+            for (int i = 1; i < cityName.length(); i++) {
+                if (Character.isUpperCase(cityName.charAt(i))) {
+                    indexes.add(i);
+                }
+            }
+            String tmp = "";
+            int lastIndex = 0;
+            for (Integer i : indexes) {
+                tmp = tmp + cityName.substring(lastIndex, i) + " ";
+                lastIndex = i;
+            }
+            tmp = tmp + cityName.substring(lastIndex);
+            Label cityLabel = (Label) getNodeById(player.getName().toLowerCase() + "Location", GameController._gamePane);
+            cityLabel.setText(tmp);
+
+            ImageView cityPlayerImage = (ImageView) getNodeById(player.getCurrentCity() + player.getName() + "Image", GameController._gamePane);
+
+            try {
+                List<File> files = getAllFilesFromResource("hr/game/pandemic/images/roles/pawns/");
+
+                for (File f : files) {
+                    //if (f.getName().equals(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, player.getRoleName().replaceAll(" ", "") + "_pawn.png")))
+                    if (f.getName().equals(player.getRoleName().toLowerCase().replaceAll(" ", "_") + "_pawn.png"))
+                        cityPlayerImage.setImage(new Image(new FileInputStream(f)));
+                }
+                cityPlayerImage.setFitWidth(20);
+                cityPlayerImage.setFitHeight(20);
+
+            } catch (URISyntaxException | IOException e) {
+                throw new RuntimeException(e);
             }
         }
-        String tmp = "";
-        int lastIndex = 0;
-        for (Integer i : indexes) {
-            tmp = tmp + cityName.substring(lastIndex, i) + " ";
-            lastIndex = i;
-        }
-        tmp = tmp + cityName.substring(lastIndex);
-        Label cityLabel = (Label) getNodeById(player.getName().toLowerCase() + "Location", GameController._gamePane);
-        cityLabel.setText(tmp);
-
-        ImageView cityPlayerImage = (ImageView) getNodeById(player.getCurrentCity() + player.getName() + "Image", GameController._gamePane);
-
-        try {
-            List<File> files = getAllFilesFromResource("hr/game/pandemic/images/roles/pawns/");
-
-            for (File f : files) {
-                //if (f.getName().equals(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, player.getRoleName().replaceAll(" ", "") + "_pawn.png")))
-                if (f.getName().equals(player.getRoleName().toLowerCase().replaceAll(" ", "_") + "_pawn.png"))
-                    cityPlayerImage.setImage(new Image(new FileInputStream(f)));
-            }
-            cityPlayerImage.setFitWidth(20);
-            cityPlayerImage.setFitHeight(20);
-            if (!player.getPreviousCity().isEmpty()) {
-                ImageView previousCityPlayerImage = (ImageView) getNodeById(player.getPreviousCity() + player.getName() + "Image", GameController._gamePane);
-                previousCityPlayerImage.setImage(null);
-            }
-
-        } catch (URISyntaxException | IOException e) {
-            throw new RuntimeException(e);
+        if (!player.getPreviousCity().isEmpty()) {
+            ImageView previousCityPlayerImage = (ImageView) getNodeById(player.getPreviousCity() + player.getName() + "Image", GameController._gamePane);
+            previousCityPlayerImage.setImage(null);
         }
     }
     public static List<File> getAllFilesFromResource(String folder) throws URISyntaxException, IOException {

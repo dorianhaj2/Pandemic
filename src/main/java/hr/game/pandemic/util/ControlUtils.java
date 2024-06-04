@@ -2,6 +2,7 @@ package hr.game.pandemic.util;
 
 import hr.game.pandemic.GameController;
 import hr.game.pandemic.model.*;
+import hr.game.pandemic.model.roles.Researcher;
 import javafx.event.Event;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -150,31 +151,24 @@ public class ControlUtils {
         controlGrid.getChildren().removeIf(node -> node.getId().equals("action7"));
         boolean twoPlayersOnSameCity = false;
         playersOnCurrentCity = new ArrayList<>();
+        List<Player> playersWithCurrentCityCardOrAreResearchers = new ArrayList<>();
         for (Player p : GameController.players) {
             if (!p.equals(currentPlayer))
                 if (p.getCurrentCity().equals(currentPlayer.getCurrentCity())) {
                     twoPlayersOnSameCity = true;
                     playersOnCurrentCity.add(p);
+                    playersWithCurrentCityCardOrAreResearchers.add(p);
                 }
+        }
+        playersWithCurrentCityCardOrAreResearchers.add(currentPlayer);
 
-        }
-        Player playerWhoHasCurrentCityCard = null;
         if (twoPlayersOnSameCity) {
-            if (currentPlayer.getHand().stream()
-                    .anyMatch(card -> card.getName().equals(currentPlayer.getCurrentCity()))){
-                playerWhoHasCurrentCityCard = currentPlayer;
-            } else {
-                for (Player p : playersOnCurrentCity) {
-                    if (p.getHand().stream()
-                            .anyMatch(card -> card.getName().equals(currentPlayer.getCurrentCity()))) {
-                        playerWhoHasCurrentCityCard = p;
-                    }
-                }
-            }
+            playersWithCurrentCityCardOrAreResearchers.removeIf(p -> p.getHand().stream().noneMatch(card -> card.getName().equals(currentPlayer.getCurrentCity())) && !(p instanceof Researcher));
         }
-        if (playerWhoHasCurrentCityCard != null) {
+
+        if (!playersWithCurrentCityCardOrAreResearchers.isEmpty()) {
             Button shareKnowledgeButton = new Button("Share Knowledge");
-            shareKnowledgeButton.setUserData(playerWhoHasCurrentCityCard);
+            shareKnowledgeButton.setUserData(playersWithCurrentCityCardOrAreResearchers);
             shareKnowledgeButton.setWrapText(true);
             GridPane.setMargin(shareKnowledgeButton, new Insets(5, 5, 5, 5));
             shareKnowledgeButton.setId("action7");

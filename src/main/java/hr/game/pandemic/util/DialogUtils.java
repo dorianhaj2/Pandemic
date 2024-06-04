@@ -324,7 +324,7 @@ public class DialogUtils {
         return playerToMove;
     }
 
-    public static Player showPickAnotherPlayerDialog(String title, boolean currentCityOnly) {
+    public static Player showPickAnotherPlayerDialog(String title, boolean currentCityOnly, List<Player> players) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(GameApplication.class.getResource("dialog_fxmls/pick-a-card-dialog.fxml"));
             DialogPane pickACardDialogPane = fxmlLoader.load();
@@ -336,7 +336,9 @@ public class DialogUtils {
             pickGrid = (GridPane) FXMLUtils.getNodeById("pickACardGridPane", pickACardDialogPane);
 
             List<Player> playersToGet;
-            if (currentCityOnly) {
+            if (players != null) {
+                playersToGet = players;
+            } else if (currentCityOnly) {
                 playersToGet = ControlUtils.playersOnCurrentCity;
             } else {
                 playersToGet = GameController.players;
@@ -376,13 +378,28 @@ public class DialogUtils {
         return null;
     }
 
+    public static Player showPickAnotherPlayerDialog(String title, boolean currentCityOnly) {
+        return showPickAnotherPlayerDialog(title, currentCityOnly, null);
+    }
+
     public static boolean showTakeCardConfirmationDialog(Player player) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Are you sure?");
         alert.setHeaderText("Take card from " + player.getName() + "?");
 
+
         Optional<ButtonType> option = alert.showAndWait();
         return ButtonType.OK.equals(option.get());
+    }
+
+    public static boolean showTakeCardOrGiveCardDialog() {
+        ButtonType take = new ButtonType("Take", ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType give = new ButtonType("Give", ButtonBar.ButtonData.CANCEL_CLOSE);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Do you want to give a card to a player or take a card from a player?", take, give);
+        //alert.setTitle("Do you want to give a card to a player or take a card from a player?");
+
+        Optional<ButtonType> option = alert.showAndWait();
+        return take.equals(option.get());
     }
 
     public static String showPickAColorDialog(String colorsToShow) {

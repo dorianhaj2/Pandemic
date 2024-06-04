@@ -24,7 +24,7 @@ public class EventsUtils {
 
     public static void onEventCardClick(Event event) {
         if (event.getSource() instanceof Button b) {
-            int playerNumber = b.getId().charAt(6) - '0';
+            int playerNumber = b.getId().charAt(10) - '0';
             playerNumber--;
             onEventCardPlay((EventCard) b.getUserData(), GameController.players.get(playerNumber));
         }
@@ -32,16 +32,13 @@ public class EventsUtils {
     public static void onEventCardPlay(EventCard eventCard, Player eventPlayer) {
         cardPlayed = false;
 
-        if (eventCard.getName().equals("Forecast"))
-            onForecastEventPlay();
-        else if (eventCard.getName().equals("Airlift"))
-            onAirliftEventPlay(eventPlayer);
-        else if (eventCard.getName().equals("Government Grant"))
-            onGovernmentGrantEventPlay();
-        else if (eventCard.getName().equals("Resilient Population"))
-            onResilientPopulationPlay();
-        else if (eventCard.getName().equals("One Quiet Night"))
-            onOneQuietNightEventPlay();
+        switch (eventCard.getName()) {
+            case "Forecast" -> onForecastEventPlay();
+            case "Airlift" -> onAirliftEventPlay(eventPlayer);
+            case "Government Grant" -> onGovernmentGrantEventPlay();
+            case "Resilient Population" -> onResilientPopulationPlay();
+            case "One Quiet Night" -> onOneQuietNightEventPlay();
+        }
 
         if (cardPlayed)
             GameController.playerDiscardCard(eventPlayer, eventCard);
