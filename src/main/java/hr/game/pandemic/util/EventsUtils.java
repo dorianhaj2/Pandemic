@@ -1,7 +1,6 @@
 package hr.game.pandemic.util;
 
 import hr.game.pandemic.GameController;
-import hr.game.pandemic.model.City;
 import hr.game.pandemic.model.CityCard;
 import hr.game.pandemic.model.EventCard;
 import hr.game.pandemic.model.Player;
@@ -80,7 +79,7 @@ public class EventsUtils {
             airliftPlayed = true;
             ControlUtils.currentPlayer = pickedPlayer;
             ControlUtils.enableAllCityButtonsExceptCurrentPlayer();
-            ControlUtils.disableAllPlayerHandCards();
+            ControlUtils.showOrHideControlsDependingOnCurrentPlayer(true);
             ControlUtils.disableAllOtherControls("");
             cardPlayed = true;
         }
@@ -110,7 +109,7 @@ public class EventsUtils {
     public static void onGovernmentGrantEventPlay() {
         governmentGrandPlayed = true;
         ControlUtils.enableAllCityButtons();
-        ControlUtils.disableAllPlayerHandCards();
+        ControlUtils.showOrHideControlsDependingOnCurrentPlayer(true);
         ControlUtils.disableAllOtherControls("");
         cardPlayed = true;
     }

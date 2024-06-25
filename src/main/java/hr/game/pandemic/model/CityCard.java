@@ -1,6 +1,8 @@
 package hr.game.pandemic.model;
 
-public class CityCard extends Card{
+import java.io.Serializable;
+
+public class CityCard extends Card implements Serializable {
     private String color;
 
     public CityCard() {

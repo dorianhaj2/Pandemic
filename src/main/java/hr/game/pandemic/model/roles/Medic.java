@@ -3,9 +3,10 @@ package hr.game.pandemic.model.roles;
 import hr.game.pandemic.model.Card;
 import hr.game.pandemic.model.Player;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Medic extends Player {
+public class Medic extends Player implements Serializable {
 
     public Medic() {
     }

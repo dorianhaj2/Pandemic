@@ -1,5 +1,6 @@
 package hr.game.pandemic.util;
 
+import hr.game.pandemic.GameApplication;
 import hr.game.pandemic.GameController;
 import hr.game.pandemic.model.*;
 import hr.game.pandemic.model.roles.Researcher;
@@ -15,6 +16,7 @@ import javafx.scene.text.Font;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ControlUtils {
 
@@ -27,12 +29,30 @@ public class ControlUtils {
     public static int redCount;
     public static int blackCount;
 
-    public static void showPhaseOneControls(Player player) {
-        currentPlayer = player;
+    public static void showOrHideControlsDependingOnCurrentPlayer(boolean disableHandCards) {
+        for (Player player : GameController.players) {
+            if (player.getName().toUpperCase().equals(GameApplication.player.name())) {
+                if (currentPlayer == player){
+                    showPhaseOneControls();
+                } else {
+                    disableAllOtherControls("");
+                }
+                enableOrDisableAllPlayerHandCards(player.getName().charAt(6) - '0', disableHandCards);
+            } else {
+                enableOrDisableAllPlayerHandCards(player.getName().charAt(6) - '0', true);
+            }
+        }
+    }
+
+    public static void startTurn() {
+        GameState.NUMBER_OF_ACTIONS = 4;
+    }
+
+    public static void showPhaseOneControls() { //Player player
+//        currentPlayer = player;
         disableAllCityButtons();
 
         controlGrid = (GridPane) FXMLUtils.getNodeById("controlGrid", GameController._gamePane);
-        GameState.NUMBER_OF_ACTIONS = 4;
         controlGrid.getChildren().clear();
 
         Label actionsLabel = new Label("Actions: " + GameState.NUMBER_OF_ACTIONS);
@@ -201,27 +221,32 @@ public class ControlUtils {
             }
         }
 
-        City currentCity = GameController.cities.stream()
+        Optional<City> currentCityOptional = GameController.cities.stream()
                 .filter(c -> c.getName().equals(currentPlayer.getCurrentCity()))
-                .findAny()
-                .orElse(null);
+                .findAny();
 
-        if ((yellowCount > 4 || blueCount > 4 || redCount > 4 || blackCount > 4) && currentCity.isResearchStation()) {
-            Button discoverACureButton = new Button("Discover a Cure");
-            discoverACureButton.setWrapText(true);
-            GridPane.setMargin(discoverACureButton, new Insets(5, 5, 5, 5));
-            discoverACureButton.setId("action8");
-            Tooltip discoverACureTooltip = new Tooltip("At any research station, discard 5 City cards of the same color from your hand to cure the disease of that color.");
-            discoverACureButton.setTooltip(discoverACureTooltip);
-            discoverACureButton.setOnAction(OtherActionUtils::onDiscoverACureButtonClick);
-            controlGrid.add(discoverACureButton, 3, 1);
+        if (currentCityOptional.isPresent()) {
+            City currentCity = currentCityOptional.get();
+            if (((yellowCount > 4 || blueCount > 4 || redCount > 4 || blackCount > 4) && currentCity.isResearchStation()) || GameState.EASY_MODE) {
+                Button discoverACureButton = new Button("Discover a Cure");
+                discoverACureButton.setWrapText(true);
+                GridPane.setMargin(discoverACureButton, new Insets(5, 5, 5, 5));
+                discoverACureButton.setId("action8");
+                Tooltip discoverACureTooltip = new Tooltip("At any research station, discard 5 City cards of the same color from your hand to cure the disease of that color.");
+                discoverACureButton.setTooltip(discoverACureTooltip);
+                discoverACureButton.setOnAction(OtherActionUtils::onDiscoverACureButtonClick);
+                controlGrid.add(discoverACureButton, 3, 1);
+            }
         }
     }
 
     public static void passTurn() {
         if (!GameState.END_GAME){
             GameState.NUMBER_OF_TURNS++;
-            showPhaseOneControls(GameController.players.get(GameState.getCurrentPlayerNumber() - 1));
+            GameController.setCurrentPlayerBasedOnNumberOfTurns();
+            showOrHideControlsDependingOnCurrentPlayer(false);
+            startTurn();
+            GameApplication.client.sendGameState();
         }
     }
 
@@ -240,19 +265,11 @@ public class ControlUtils {
         }
     }
 
-    public static void disableAllPlayerHandCards() {
-        List<Node> allActions = FXMLUtils.getNodesByIdStartsWith("playerCard", GameController._gamePane);
+    public static void enableOrDisableAllPlayerHandCards(int playerNumber, boolean disable) {
+        List<Node> allActions = FXMLUtils.getNodesByIdStartsWith("playerCard" + playerNumber, GameController._gamePane);
         for (Node node : allActions) {
             if (node instanceof Button b)
-                b.setDisable(true);
-        }
-    }
-
-    public static void enableAllPlayerHandCards() {
-        List<Node> allActions = FXMLUtils.getNodesByIdStartsWith("playerCard", GameController._gamePane);
-        for (Node node : allActions) {
-            if (node instanceof Button b)
-                b.setDisable(false);
+                b.setDisable(disable);
         }
     }
 

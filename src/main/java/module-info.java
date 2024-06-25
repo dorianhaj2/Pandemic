@@ -2,6 +2,8 @@ module hr.game.pandemic {
     requires javafx.controls;
     requires javafx.fxml;
     requires json.simple;
+    requires org.apache.commons.lang3;
+    requires java.rmi;
 
     opens hr.game.pandemic.dialogs to javafx.fxml;
     exports hr.game.pandemic.dialogs;

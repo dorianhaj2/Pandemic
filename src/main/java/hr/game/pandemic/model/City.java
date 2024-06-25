@@ -2,10 +2,11 @@ package hr.game.pandemic.model;
 
 import hr.game.pandemic.GameController;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class City {
+public class City implements Serializable {
     private String name;
     private String color;
     private List<String> diseases;
@@ -85,7 +86,7 @@ public class City {
                         || GameState.BLUE_CURE && disease.equals("blue")
                         || GameState.YELLOW_CURE && disease.equals("yellow")
                         || GameState.RED_CURE && disease.equals("red")))){
-                    System.out.println("Infecting " + name);
+                    //System.out.println("Infecting " + name);
                     this.diseases.add(disease);
                     if (disease.equals("yellow"))
                         GameState.YELLOW_CUBES--;

@@ -1,10 +1,9 @@
 package hr.game.pandemic.util;
 
-import hr.game.pandemic.GameController;
-import hr.game.pandemic.model.*;
 import hr.game.pandemic.GameApplication;
+import hr.game.pandemic.GameController;
 import hr.game.pandemic.dialogs.NewGameDialog;
-import hr.game.pandemic.model.Player;
+import hr.game.pandemic.model.*;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
@@ -40,6 +39,7 @@ public class DialogUtils {
                 if(clickedButton.get() == ButtonType.OK) {
                     controller.setDifficulty();
                     controller.setNumOfPlayers();
+                    controller.setCheat();
                     return true;
                 } else if (clickedButton.get() == ButtonType.CANCEL) {
                     return false;

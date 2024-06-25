@@ -1,7 +1,10 @@
 package hr.game.pandemic.util;
 
+import hr.game.pandemic.GameApplication;
 import hr.game.pandemic.GameController;
-import hr.game.pandemic.model.*;
+import hr.game.pandemic.model.City;
+import hr.game.pandemic.model.CityCard;
+import hr.game.pandemic.model.GameState;
 import hr.game.pandemic.model.roles.Medic;
 import javafx.event.Event;
 import javafx.scene.Node;
@@ -51,39 +54,44 @@ public class MovementActionUtils {
     }
 
     public static void actionDone() {
-        List<Node> allActions = FXMLUtils.getNodesByIdStartsWith("action", GameController._gamePane);
+        if (!GameState.END_GAME) {
+            List<Node> allActions = FXMLUtils.getNodesByIdStartsWith("action", GameController._gamePane);
 
-        for (Node n : allActions) {
-            Button actionButton = (Button) n;
-            if (actionButton.getText().equals("Cancel")) {
-                actionButton.setText((String) actionButton.getUserData());
+            for (Node n : allActions) {
+                Button actionButton = (Button) n;
+                if (actionButton.getText().equals("Cancel")) {
+                    actionButton.setText((String) actionButton.getUserData());
+                }
             }
-        }
-        GameState.NUMBER_OF_ACTIONS--;
-        Label actionCounterLabel = (Label) FXMLUtils.getNodeById("actCounter", GameController._gamePane);
-        actionCounterLabel.setText("Actions: " + GameState.NUMBER_OF_ACTIONS);
-        ControlUtils.disableAllCityButtons();
-        ControlUtils.enableAllControls();
+            GameState.NUMBER_OF_ACTIONS--;
+            Label actionCounterLabel = (Label) FXMLUtils.getNodeById("actCounter", GameController._gamePane);
+            actionCounterLabel.setText("Actions: " + GameState.NUMBER_OF_ACTIONS);
+            ControlUtils.disableAllCityButtons();
+            ControlUtils.enableAllControls();
 
-        if (GameState.NUMBER_OF_ACTIONS == 0)
-            startPhaseTwo();
-        ControlUtils.showCharterFlightAndBuildResearchStationButtonsIfPlayerHasCurrentCityCard();
-        ControlUtils.showShuttleFlightButtonIfPlayerIsOnResearchStation();
-        ControlUtils.showTreatDiseaseButton();
-        ControlUtils.showShareKnowledgeButton();
-        ControlUtils.showDiscoverCureButton();
+            if (GameState.NUMBER_OF_ACTIONS == 0)
+                startPhaseTwo();
+//            ControlUtils.showCharterFlightAndBuildResearchStationButtonsIfPlayerHasCurrentCityCard();
+//            ControlUtils.showShuttleFlightButtonIfPlayerIsOnResearchStation();
+//            ControlUtils.showTreatDiseaseButton();
+//            ControlUtils.showShareKnowledgeButton();
+//            ControlUtils.showDiscoverCureButton();
+            ControlUtils.showOrHideControlsDependingOnCurrentPlayer(false);
+            GameApplication.client.sendGameState();
+        }
     }
 
     public static void startPhaseTwo() {
-        boolean drawnEpidemic = GameController.playerDrawCard(ControlUtils.currentPlayer);
-        if (drawnEpidemic && !GameState.END_GAME)
-            onEpidemicCardDraw();
-        boolean drawnSecondEpidemic = GameController.playerDrawCard(ControlUtils.currentPlayer);
         if (!GameState.END_GAME) {
+            boolean drawnEpidemic = GameController.playerDrawCard(ControlUtils.currentPlayer);
+            if (drawnEpidemic)
+                onEpidemicCardDraw();
+            boolean drawnSecondEpidemic = GameController.playerDrawCard(ControlUtils.currentPlayer);
+
             if (drawnSecondEpidemic) {
                 onEpidemicCardDraw();
             }
-           GameController.checkIfPlayerHasTooManyCards(ControlUtils.currentPlayer);
+            GameController.checkIfPlayerHasTooManyCards(ControlUtils.currentPlayer);
             startPhaseThree();
         }
     }

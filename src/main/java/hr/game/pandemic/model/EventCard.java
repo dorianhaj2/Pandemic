@@ -1,6 +1,8 @@
 package hr.game.pandemic.model;
 
-public class EventCard extends Card{
+import java.io.Serializable;
+
+public class EventCard extends Card implements Serializable {
     private String description;
     public EventCard() {
     }

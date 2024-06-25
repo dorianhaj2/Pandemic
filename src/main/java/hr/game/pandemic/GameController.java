@@ -16,17 +16,21 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
-import org.json.simple.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.*;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 
 public class GameController {
+    private static final String SAVE_GAME_FILE_NAME = "files/save.bin";
     @FXML
     private Pane gamePane;
     private static boolean SETUP;
@@ -41,7 +45,7 @@ public class GameController {
     public static List<City> cities = new ArrayList<>();
     public static List<List<String>> citiesColors = new ArrayList<>();
     private static List<String> outbreaksInCitiesInCurrentChain = new ArrayList<>();
-    public void initialize() {
+    public void initialize() throws InterruptedException {
         _gamePane = gamePane;
         //Read cities and their corresponding colors from file
         try(BufferedReader br = new BufferedReader(new FileReader("files/cityColors.csv"))){
@@ -82,7 +86,7 @@ public class GameController {
         }
 
         for (City c : cities) {
-            FXMLUtils.addGridViewForPlayersAndLabelsForDiseasesToCity(c);
+            FXMLUtils.addGridViewForPlayersAndImagesAndLabelsForDiseasesToCity(c);
         }
 
         while(GameState.DIFFICULTY == null)
@@ -102,14 +106,14 @@ public class GameController {
                 cityButton.getStyleClass().add("research_station");
 
                 ControlUtils.disableAllCityButtons();
-                ControlUtils.enableAllControls();
-                ControlUtils.enableAllPlayerHandCards();
+                //ControlUtils.enableAllControls();
+                ControlUtils.showOrHideControlsDependingOnCurrentPlayer(false);
             } else if (EventsUtils.airliftPlayed) {
                 MovementActionUtils.moveCurrentPlayerToCity(b.getId());
-                ControlUtils.currentPlayer = players.get(GameState.getCurrentPlayerNumber() - 1);
+                setCurrentPlayerBasedOnNumberOfTurns();
                 EventsUtils.airliftPlayed = false;
-                ControlUtils.enableAllControls();
-                ControlUtils.enableAllPlayerHandCards();
+                //ControlUtils.enableAllControls();
+                ControlUtils.showOrHideControlsDependingOnCurrentPlayer(false);
             } else {
                 MovementActionUtils.moveCurrentPlayerToCity(b.getId());
                 MovementActionUtils.actionDone();
@@ -118,132 +122,185 @@ public class GameController {
         }
 
     }
+
+    public static void setCurrentPlayerBasedOnNumberOfTurns() {
+        ControlUtils.currentPlayer = players.get(GameState.getCurrentPlayerNumber() - 1);
+    }
+
     public void saveGame() {
+        GameStateDTO gameStateDTO = new GameStateDTO();
 
-    }
-    public void loadGame() {
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(
+                    new FileOutputStream(SAVE_GAME_FILE_NAME)
+            );
 
-    }
-    public void newGame() {
-        boolean startGame = DialogUtils.showNewGameDialog();
-        if (startGame) {
-            GameState.NUMBER_OF_TURNS = 0;
-            GameState.OUTBREAK_COUNTER = 0;
-            GameState.INFECTION_RATE = 1;
-            GameState.YELLOW_CUBES = 24;
-            GameState.RED_CUBES = 24;
-            GameState.BLUE_CUBES = 24;
-            GameState.BLACK_CUBES = 24;
-            GameState.RESEARCH_STATIONS = 5;
-            GameState.YELLOW_CURE = false;
-            GameState.RED_CURE = false;
-            GameState.BLUE_CURE = false;
-            GameState.BLACK_CURE = false;
-            GameState.YELLOW_ERADICATED = false;
-            GameState.RED_ERADICATED = false;
-            GameState.BLUE_ERADICATED = false;
-            GameState.BLACK_ERADICATED = false;
-            GameState.END_GAME = false;
-            SETUP = true;
+            oos.writeObject(gameStateDTO);
 
-            for (Node node : FXMLUtils.getNodesByIdStartsWith("outbreak", _gamePane)) {
-                ImageView iv = (ImageView) node;
-                iv.setVisible(false);
-            }
+            showAlert("Save game", "Game saved!");
 
-            for (Node node : FXMLUtils.getNodesByIdStartsWith("infectionRate", _gamePane)) {
-                ImageView iv = (ImageView) node;
-                iv.setVisible(false);
-            }
-            ImageView ivInfectionRate1 = (ImageView) FXMLUtils.getNodeById("infectionRate1", gamePane);
-            ivInfectionRate1.setVisible(true);
-
-            GridPane playersGrid = (GridPane) FXMLUtils.getNodeById("playersGridPane", _gamePane);
-            List<Node> nodesToRemove = new ArrayList<>();
-            for (Node node : playersGrid.getChildren()) {
-                if (node.getId().startsWith("player"))
-                    nodesToRemove.add(node);
-            }
-            playersGrid.getChildren().removeAll(nodesToRemove);
-            for (int i = 0; i < GameState.NUMBER_OF_PLAYERS; i++) {
-                FXMLUtils.addPlayerToPlayersGrid(playersGrid, i+1);
-            }
-
-            for (City city : cities) {
-                city.setDiseases(new ArrayList<>());
-                Label cityDiseaseLabel = (Label) FXMLUtils.getNodeById(city.getName() + "Diseases", _gamePane);
-                cityDiseaseLabel.setText("");
-            }
-
-            List<Role> roles = new ArrayList<>(List.of(Role.values()));
-            Collections.shuffle(roles);
-
-            if (!players.isEmpty()) {
-                for (Player p : players) {
-                    p.setPreviousCity(p.getCurrentCity());
-                    p.setCurrentCity("");
-                    FXMLUtils.updatePlayerLocation(p);
-                }
-            }
-            //Add new players to list
-            players = new ArrayList<>();
-            for (int i = 0; i < GameState.NUMBER_OF_PLAYERS; i++) {
-                if (roles.getLast().equals(Role.MEDIC)) {
-                    players.add(new Medic("Player" + (i+1)));
-                } else if (roles.getLast().equals(Role.QUARANTINE_SPECIALIST)) {
-                    players.add(new QuarantineSpecialist("Player" + (i+1)));
-                } else if (roles.getLast().equals(Role.RESEARCHER)) {
-                    players.add(new Researcher("Player" + (i+1)));
-                } else if (roles.getLast().equals(Role.SCIENTIST)) {
-                    players.add(new Scientist("Player" + (i+1)));
-                }
-                roles.removeLast();
-                FXMLUtils.updatePlayerLocation(players.get(i));
-                FXMLUtils.updatePlayerRole(players.get(i));
-            }
-
-            //Add cards to infection pile and shuffle
-            infectionCardPile = new ArrayList<>(cityCards);
-            Collections.shuffle(infectionCardPile);
-            infectionDiscardPile = new ArrayList<>();
-
-            //Add initial cards to player card pile and shuffle, empty player discard pile
-            playerCardPile = new ArrayList<>(cityCards);
-            playerCardPile.addAll(eventCards);
-            Collections.shuffle(playerCardPile);
-            playerDiscardPile = new ArrayList<>();
-
-            //Empty research station list and add Atlanta
-            ControlUtils.citiesWithResearchStation.clear();
-            for (City c : cities) {
-                if (c.getName().equals("atlanta"))
-                    ControlUtils.citiesWithResearchStation.add(c);
-            }
-
-            //Players draw cards
-            for (int i = 0; i < GameState.NUMBER_OF_PLAYERS; i++) {
-                for (int j = 0; j < 6 - GameState.NUMBER_OF_PLAYERS; j++){
-                    playerDrawCard(players.get(i));
-                }
-            }
-
-            //Add epidemic cards to player card pile and shuffle
-            for (int i = 0; i < GameState.DIFFICULTY + 3; i++) {
-                playerCardPile.add(new EpidemicCard());
-            }
-            Collections.shuffle(playerCardPile);
-
-
-            //Start of game infections
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
-                    drawInfectionCard();
-                    infectCity(infectionDiscardPile.getLast().getName(), infectionDiscardPile.getLast().getColor(), 3 - i);
-                }
-            }
-            SETUP = false;
-            ControlUtils.showPhaseOneControls(players.getFirst());
+        } catch (IOException e) {
+            showAlert("Error", "Error while trying to save game: " +
+                    e.getMessage());
         }
+
+    }
+
+    public void loadGame() {
+        try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(SAVE_GAME_FILE_NAME));
+            if (ois.readObject() instanceof GameStateDTO gameStateDTO) {
+                gameStateDTO.setGameState();
+                GameApplication.client.sendGameState();
+            }
+
+            showAlert("Load game", "Game loaded!");
+
+        } catch (IOException | ClassNotFoundException e) {
+            showAlert("Error", "Error while trying to load game: " +
+                    e.getMessage());
+        }
+    }
+
+    private void showAlert(String title, String text) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(text);
+        alert.showAndWait();
+    }
+
+    public void newGame() throws InterruptedException {
+        if (GameApplication.player.equals(PlayerEnum.PLAYER1)) {
+            GameState.START_GAME = DialogUtils.showNewGameDialog();
+            if (GameState.START_GAME) {
+                GameState.NUMBER_OF_TURNS = 0;
+                GameState.OUTBREAK_COUNTER = 0;
+                GameState.INFECTION_RATE = 1;
+                GameState.YELLOW_CUBES = 24;
+                GameState.RED_CUBES = 24;
+                GameState.BLUE_CUBES = 24;
+                GameState.BLACK_CUBES = 24;
+                GameState.RESEARCH_STATIONS = 5;
+                GameState.YELLOW_CURE = false;
+                GameState.RED_CURE = false;
+                GameState.BLUE_CURE = false;
+                GameState.BLACK_CURE = false;
+                GameState.YELLOW_ERADICATED = false;
+                GameState.RED_ERADICATED = false;
+                GameState.BLUE_ERADICATED = false;
+                GameState.BLACK_ERADICATED = false;
+                GameState.END_GAME = false;
+                SETUP = true;
+
+                for (Node node : FXMLUtils.getNodesByIdStartsWith("outbreak", _gamePane)) {
+                    ImageView iv = (ImageView) node;
+                    iv.setVisible(false);
+                }
+
+                for (Node node : FXMLUtils.getNodesByIdStartsWith("infectionRate", _gamePane)) {
+                    ImageView iv = (ImageView) node;
+                    iv.setVisible(false);
+                }
+                ImageView ivInfectionRate1 = (ImageView) FXMLUtils.getNodeById("infectionRate1", gamePane);
+                ivInfectionRate1.setVisible(true);
+
+                GridPane playersGrid = (GridPane) FXMLUtils.getNodeById("playersGridPane", _gamePane);
+                List<Node> nodesToRemove = new ArrayList<>();
+                for (Node node : playersGrid.getChildren()) {
+                    if (node.getId().startsWith("player"))
+                        nodesToRemove.add(node);
+                }
+                playersGrid.getChildren().removeAll(nodesToRemove);
+                for (int i = 0; i < GameState.NUMBER_OF_PLAYERS; i++) {
+                    FXMLUtils.addPlayerToPlayersGrid(playersGrid, i + 1);
+                }
+
+                for (City city : cities) {
+                    city.setDiseases(new ArrayList<>());
+                }
+
+                List<Role> roles = new ArrayList<>(List.of(Role.values()));
+                Collections.shuffle(roles);
+
+                //Remove players from board on new game
+                if (!players.isEmpty()) {
+                    for (Player p : players) {
+                        p.setPreviousCity(p.getCurrentCity());
+                        p.setCurrentCity("");
+                        FXMLUtils.updatePlayerLocation(p);
+                    }
+                }
+                //Add new players to list
+                players = new ArrayList<>();
+                for (int i = 0; i < GameState.NUMBER_OF_PLAYERS; i++) {
+                    if (roles.getLast().equals(Role.MEDIC)) {
+                        players.add(new Medic("Player" + (i + 1)));
+                    } else if (roles.getLast().equals(Role.QUARANTINE_SPECIALIST)) {
+                        players.add(new QuarantineSpecialist("Player" + (i + 1)));
+                    } else if (roles.getLast().equals(Role.RESEARCHER)) {
+                        players.add(new Researcher("Player" + (i + 1)));
+                    } else if (roles.getLast().equals(Role.SCIENTIST)) {
+                        players.add(new Scientist("Player" + (i + 1)));
+                    }
+                    roles.removeLast();
+                    FXMLUtils.updatePlayerLocation(players.get(i));
+                    FXMLUtils.updatePlayerRole(players.get(i));
+                }
+
+                //Add cards to infection pile and shuffle
+                infectionCardPile = new ArrayList<>(cityCards);
+                Collections.shuffle(infectionCardPile);
+                infectionDiscardPile = new ArrayList<>();
+
+                //Add initial cards to player card pile and shuffle, empty player discard pile
+                playerCardPile = new ArrayList<>(cityCards);
+                playerCardPile.addAll(eventCards);
+                Collections.shuffle(playerCardPile);
+                playerDiscardPile = new ArrayList<>();
+
+                //Empty research station list and add Atlanta
+                ControlUtils.citiesWithResearchStation.clear();
+                for (City c : cities) {
+                    if (c.getName().equals("atlanta"))
+                        ControlUtils.citiesWithResearchStation.add(c);
+                }
+
+                //Players draw cards
+                for (int i = 0; i < GameState.NUMBER_OF_PLAYERS; i++) {
+                    for (int j = 0; j < 6 - GameState.NUMBER_OF_PLAYERS; j++) {
+                        playerDrawCard(players.get(i));
+                    }
+                }
+
+                //Add epidemic cards to player card pile and shuffle
+                for (int i = 0; i < GameState.DIFFICULTY + 3; i++) {
+                    playerCardPile.add(new EpidemicCard());
+                }
+                Collections.shuffle(playerCardPile);
+
+                //Start of game infections
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 0; j < 3; j++) {
+                        drawInfectionCard();
+                        infectCity(infectionDiscardPile.getLast().getName(), infectionDiscardPile.getLast().getColor(), 3 - i);
+                    }
+                }
+                ControlUtils.currentPlayer = players.getFirst();
+                SETUP = false;
+                GameApplication.client.sendGameState();
+                ControlUtils.startTurn();
+                ControlUtils.showOrHideControlsDependingOnCurrentPlayer(false);
+            }
+        } else {
+                GameState.DIFFICULTY = 1;
+                Label waitToStartLabel = new Label("Waiting for host to start the game...");
+                waitToStartLabel.setId("waitToStartLabel");
+                waitToStartLabel.setLayoutX(1560);
+                waitToStartLabel.setLayoutY(500);
+
+                gamePane.getChildren().add(waitToStartLabel);
+        }
+
     }
 
     public static boolean playerDrawCard(Player player) {
@@ -282,8 +339,6 @@ public class GameController {
                 }
             }
         }
-//        if (player.getHand().size() > 7)
-//            checkIfPlayerHasTooManyCards(player);
     }
 
     public static void refreshPlayerHand(Player player) {
@@ -346,7 +401,7 @@ public class GameController {
                 }
                 if (toInfect) {
                     boolean toOutbreak = cityToInfect.infect(diseaseColor, amount);
-                    FXMLUtils.refreshCityButtonText(cityToInfect);
+                    FXMLUtils.refreshCityDiseases(cityToInfect);
                     FXMLUtils.refreshDiseaseCubeCount();
                     if (toOutbreak) {
                         outbreaksInCitiesInCurrentChain.add(cityName);
@@ -396,8 +451,8 @@ public class GameController {
 
     public static void endGame(boolean gameWin, String loseReason) {
         GameState.END_GAME = true;
+        ControlUtils.showOrHideControlsDependingOnCurrentPlayer(true);
         ControlUtils.disableAllOtherControls("");
-        ControlUtils.disableAllPlayerHandCards();
         ControlUtils.disableAllCityButtons();
         Alert endGameAlert = new Alert(Alert.AlertType.INFORMATION);
         if (gameWin) {
@@ -408,6 +463,10 @@ public class GameController {
             endGameAlert.setHeaderText(loseReason);
         }
         endGameAlert.showAndWait();
+    }
+
+    public static void setGamePane(Pane pane) {
+
     }
 
 }

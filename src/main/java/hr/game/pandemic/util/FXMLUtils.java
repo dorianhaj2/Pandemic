@@ -1,7 +1,9 @@
 package hr.game.pandemic.util;
 
 import hr.game.pandemic.GameController;
-import hr.game.pandemic.model.*;
+import hr.game.pandemic.model.City;
+import hr.game.pandemic.model.GameState;
+import hr.game.pandemic.model.Player;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -10,7 +12,9 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,23 +24,28 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class FXMLUtils {
     public static void moveOutbreakToken() {
-        ImageView iv = (ImageView) getNodeById("outbreak" + GameState.OUTBREAK_COUNTER, GameController._gamePane);
-        iv.setVisible(true);
-        if (GameState.OUTBREAK_COUNTER > 1){
-            ImageView ivPrev = (ImageView) getNodeById("outbreak" + (GameState.OUTBREAK_COUNTER - 1), GameController._gamePane);
-            ivPrev.setVisible(false);
+        if (GameState.OUTBREAK_COUNTER > 0) {
+            ImageView iv = (ImageView) getNodeById("outbreak" + GameState.OUTBREAK_COUNTER, GameController._gamePane);
+            iv.setVisible(true);
+            if (GameState.OUTBREAK_COUNTER > 1){
+                ImageView ivPrev = (ImageView) getNodeById("outbreak" + (GameState.OUTBREAK_COUNTER - 1), GameController._gamePane);
+                ivPrev.setVisible(false);
+            }
         }
     }
     public static void moveInfectionRateToken() {
         ImageView iv = (ImageView) getNodeById("infectionRate" + GameState.INFECTION_RATE, GameController._gamePane);
         iv.setVisible(true);
-        ImageView ivPrev = (ImageView) getNodeById("infectionRate" + (GameState.INFECTION_RATE - 1), GameController._gamePane);
-        ivPrev.setVisible(false);
+        if (GameState.INFECTION_RATE > 1) {
+            ImageView ivPrev = (ImageView) getNodeById("infectionRate" + (GameState.INFECTION_RATE - 1), GameController._gamePane);
+            ivPrev.setVisible(false);
+        }
     }
     public static void addPlayerToPlayersGrid(GridPane playersGrid, Integer playerNumber){
         GridPane playerGridPane = new GridPane();
@@ -81,15 +90,18 @@ public class FXMLUtils {
 
         playerGridPane.add(titleFlowPane, 0,0);
         playerGridPane.add(playerHandGridPane, 0, 1);
+        playersGrid.getChildren().removeIf(node -> node.getId().equals("player" + playerNumber + "Grid"));
         playersGrid.add(playerGridPane, 0,playerNumber - 1);
     }
-    public static void refreshCityButtonText(City city) {
-        Label cityDiseaseLabel = (Label) getNodeById(city.getName() + "Diseases", GameController._gamePane);
-        cityDiseaseLabel.setText(city.getBlueDiseases() + "Blu" +
-                city.getYellowDiseases() + "Y" +
-                city.getBlackDiseases() + "Bla" +
-                city.getRedDiseases() + "R");
-
+    public static void refreshCityDiseases(City city) {
+        Label redDiseaseLabel = (Label) getNodeById(city.getName() + "RedCount", GameController._gamePane);
+        redDiseaseLabel.setText(Integer.toString(city.getRedDiseases()));
+        Label yellowDiseaseLabel = (Label) getNodeById(city.getName() + "YellowCount", GameController._gamePane);
+        yellowDiseaseLabel.setText(Integer.toString(city.getYellowDiseases()));
+        Label blueDiseaseLabel = (Label) getNodeById(city.getName() + "BlueCount", GameController._gamePane);
+        blueDiseaseLabel.setText(Integer.toString(city.getBlueDiseases()));
+        Label blackDiseaseLabel = (Label) getNodeById(city.getName() + "BlackCount", GameController._gamePane);
+        blackDiseaseLabel.setText(Integer.toString(city.getBlackDiseases()));
     }
     public static Node getNodeById(String id, Parent parent){
         Node result = null;
@@ -132,22 +144,23 @@ public class FXMLUtils {
     public static void updatePlayerLocation(Player player) {
         if (!player.getCurrentCity().isEmpty()) {
             String cityName = player.getCurrentCity().substring(0, 1).toUpperCase() + player.getCurrentCity().substring(1);
-            List<Integer> indexes = new ArrayList<>();
-
-            for (int i = 1; i < cityName.length(); i++) {
-                if (Character.isUpperCase(cityName.charAt(i))) {
-                    indexes.add(i);
-                }
-            }
-            String tmp = "";
-            int lastIndex = 0;
-            for (Integer i : indexes) {
-                tmp = tmp + cityName.substring(lastIndex, i) + " ";
-                lastIndex = i;
-            }
-            tmp = tmp + cityName.substring(lastIndex);
+//            List<Integer> indexes = new ArrayList<>();
+//
+//            for (int i = 1; i < cityName.length(); i++) {
+//                if (Character.isUpperCase(cityName.charAt(i))) {
+//                    indexes.add(i);
+//                }
+//            }
+//            String tmp = "";
+//            int lastIndex = 0;
+//            for (Integer i : indexes) {
+//                tmp = tmp + cityName.substring(lastIndex, i) + " ";
+//                lastIndex = i;
+//            }
+//            tmp = tmp + cityName.substring(lastIndex);
+            String cityNameNormalCase = StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(cityName), StringUtils.SPACE);
             Label cityLabel = (Label) getNodeById(player.getName().toLowerCase() + "Location", GameController._gamePane);
-            cityLabel.setText(tmp);
+            cityLabel.setText(cityNameNormalCase);
 
             ImageView cityPlayerImage = (ImageView) getNodeById(player.getCurrentCity() + player.getName() + "Image", GameController._gamePane);
 
@@ -175,7 +188,6 @@ public class FXMLUtils {
         ClassLoader classLoader = FXMLUtils.class.getClassLoader();
         URL resource = classLoader.getResource(folder);
 
-        // dun walk the root path, we will walk all the classes
         List<File> collect = Files.walk(Paths.get(resource.toURI()))
                 .filter(Files::isRegularFile)
                 .map(x -> x.toFile())
@@ -183,7 +195,7 @@ public class FXMLUtils {
 
         return collect;
     }
-    public static void addGridViewForPlayersAndLabelsForDiseasesToCity(City c) {
+    public static void addGridViewForPlayersAndImagesAndLabelsForDiseasesToCity(City c) {
         Button cityButton = (Button) FXMLUtils.getNodeById(c.getName(), GameController._gamePane);
 
         GridPane newCityGridPane = new GridPane();
@@ -220,42 +232,130 @@ public class FXMLUtils {
         newCityGridPane.add(imageView3, 0 , 1);
         newCityGridPane.add(imageView4, 1 , 1);
 
+
         GameController._gamePane.getChildren().add(newCityGridPane);
 
-        Label cityDiseaseLabel = new Label();
-        cityDiseaseLabel.setId(c.getName() + "Diseases");
-        cityDiseaseLabel.setLayoutX(cityButton.getLayoutX() - 30);
-        cityDiseaseLabel.setLayoutY(cityButton.getLayoutY() + 12);
-        cityDiseaseLabel.setMouseTransparent(true);
-        cityDiseaseLabel.getStyleClass().add("disease_label");
+        GridPane newCityDiseaseGridPane = new GridPane();
+        newCityDiseaseGridPane.setId(c.getName() + "DiseaseGrid");
+        int gridOffset = 25;
+        if (c.getName().equals("sanFrancisco")) gridOffset = 18;
+        newCityDiseaseGridPane.setLayoutX(cityButton.getLayoutX() - gridOffset);
+        newCityDiseaseGridPane.setLayoutY(cityButton.getLayoutY() - 25);
+        newCityDiseaseGridPane.setMouseTransparent(true);
+        newCityDiseaseGridPane.setMaxHeight(90);
+        newCityDiseaseGridPane.setMinHeight(90);
+        newCityDiseaseGridPane.setMaxWidth(90);
+        newCityDiseaseGridPane.setMaxWidth(90);
+        ColumnConstraints colcD = new ColumnConstraints();
+        colcD.setPercentWidth(100d / 3);
+        RowConstraints rowcD = new RowConstraints();
+        rowcD.setPercentHeight(100d / 3);
+        newCityDiseaseGridPane.getRowConstraints().addAll(rowcD, rowcD, rowcD);
+        newCityDiseaseGridPane.getColumnConstraints().addAll(colcD, colcD, colcD);
 
-        Button invisibleButton = new Button();
-        invisibleButton.setLayoutX(cityButton.getLayoutX());
-        invisibleButton.setLayoutY(cityButton.getLayoutY());
-        invisibleButton.setMinWidth(40);
-        invisibleButton.setMinHeight(40);
-        invisibleButton.setMaxWidth(40);
-        invisibleButton.setMaxHeight(40);
-        invisibleButton.getStyleClass().add("invisible");
-        invisibleButton.setOnMouseEntered(event -> {
-            cityDiseaseLabel.getStyleClass().remove("disease_label");
-            cityDiseaseLabel.getStyleClass().add("disease_label_bigger");
-        });
-        invisibleButton.setOnMouseExited(event -> {
-            cityDiseaseLabel.getStyleClass().remove("disease_label_bigger");
-            cityDiseaseLabel.getStyleClass().add("disease_label");
-        });
-        cityButton.setOnMouseEntered(event -> {
-            cityDiseaseLabel.getStyleClass().remove("disease_label");
-            cityDiseaseLabel.getStyleClass().add("disease_label_bigger");
-        });
-        cityButton.setOnMouseExited(event -> {
-            cityDiseaseLabel.getStyleClass().remove("disease_label_bigger");
-            cityDiseaseLabel.getStyleClass().add("disease_label");
-        });
+        ImageView imageViewRed = new ImageView();
+        imageViewRed.setId(c.getName() + "RedCube");
+        ImageView imageViewYellow = new ImageView();
+        imageViewYellow.setId(c.getName() + "YellowCube");
+        ImageView imageViewBlue = new ImageView();
+        imageViewBlue.setId(c.getName() + "BlueCube");
+        ImageView imageViewBlack = new ImageView();
+        imageViewBlack.setId(c.getName() + "BlackCube");
 
-        GameController._gamePane.getChildren().add(cityDiseaseLabel);
-        GameController._gamePane.getChildren().add(1, invisibleButton);
+        try {
+            List<File> files = getAllFilesFromResource("hr/game/pandemic/images/");
+
+            for (File f : files) {
+                switch (f.getName()) {
+                    case "black_cube.png" -> imageViewBlack.setImage(new Image(new FileInputStream(f)));
+                    case "blue_cube.png" -> imageViewBlue.setImage(new Image(new FileInputStream(f)));
+                    case "red_cube.png" -> imageViewRed.setImage(new Image(new FileInputStream(f)));
+                    case "yellow_cube.png" -> imageViewYellow.setImage(new Image(new FileInputStream(f)));
+                }
+            }
+            imageViewRed.setFitWidth(20);
+            imageViewRed.setFitHeight(20);
+            imageViewYellow.setFitWidth(20);
+            imageViewYellow.setFitHeight(20);
+            imageViewBlue.setFitWidth(20);
+            imageViewBlue.setFitHeight(20);
+            imageViewBlack.setFitWidth(20);
+            imageViewBlack.setFitHeight(20);
+
+        } catch (URISyntaxException | IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        StackPane redStackPane = new StackPane();
+        redStackPane.setMaxHeight(30);
+        redStackPane.setMaxWidth(30);
+        redStackPane.setMinHeight(30);
+        redStackPane.setMinWidth(30);
+        StackPane.setMargin(redStackPane, new Insets(10));
+        redStackPane.getChildren().add(imageViewRed);
+        StackPane yellowStackPane = new StackPane();
+        yellowStackPane.setMaxHeight(30);
+        yellowStackPane.setMaxWidth(30);
+        yellowStackPane.setMinHeight(30);
+        yellowStackPane.setMinWidth(30);
+        StackPane.setMargin(yellowStackPane, new Insets(10));
+        yellowStackPane.getChildren().add(imageViewYellow);
+        StackPane blueStackPane = new StackPane();
+        blueStackPane.setMaxHeight(30);
+        blueStackPane.setMaxWidth(30);
+        blueStackPane.setMinHeight(30);
+        blueStackPane.setMinWidth(30);
+        StackPane.setMargin(blueStackPane, new Insets(10));
+        blueStackPane.getChildren().add(imageViewBlue);
+        StackPane blackStackPane = new StackPane();
+        blackStackPane.setMaxHeight(30);
+        blackStackPane.setMaxWidth(30);
+        blackStackPane.setMinHeight(30);
+        blackStackPane.setMinWidth(30);
+        StackPane.setMargin(blackStackPane, new Insets(10));
+        blackStackPane.getChildren().add(imageViewBlack);
+
+        newCityDiseaseGridPane.add(redStackPane, 1 , 0);
+        newCityDiseaseGridPane.add(yellowStackPane, 0 , 1);
+        newCityDiseaseGridPane.add(blueStackPane, 2 , 1);
+        newCityDiseaseGridPane.add(blackStackPane, 1 , 2);
+
+        Label redCountLabel = new Label("0");
+        redCountLabel.setId(c.getName() + "RedCount");
+        redCountLabel.setLayoutX(newCityDiseaseGridPane.getLayoutX() + 41);
+        redCountLabel.setLayoutY(newCityDiseaseGridPane.getLayoutY() + 6);
+        redCountLabel.setMinHeight(20);
+        redCountLabel.setMaxHeight(20);
+        redCountLabel.setTextFill(Color.color(1, 1, 1));
+
+        Label yellowCountLabel = new Label("0");
+        yellowCountLabel.setId(c.getName() + "YellowCount");
+        yellowCountLabel.setLayoutX(newCityDiseaseGridPane.getLayoutX() + 12);
+        yellowCountLabel.setLayoutY(newCityDiseaseGridPane.getLayoutY() + 36);
+        yellowCountLabel.setMinHeight(20);
+        yellowCountLabel.setMaxHeight(20);
+
+        Label blackCountLabel = new Label("0");
+        blackCountLabel.setId(c.getName() + "BlackCount");
+        blackCountLabel.setLayoutX(newCityDiseaseGridPane.getLayoutX() + 42);
+        blackCountLabel.setLayoutY(newCityDiseaseGridPane.getLayoutY() + 64);
+        blackCountLabel.setMinHeight(20);
+        blackCountLabel.setMaxHeight(20);
+        blackCountLabel.setTextFill(Color.color(1, 1, 1));
+
+        Label blueCountLabel = new Label("0");
+        blueCountLabel.setId(c.getName() + "BlueCount");
+        blueCountLabel.setLayoutX(newCityDiseaseGridPane.getLayoutX() + 72);
+        blueCountLabel.setLayoutY(newCityDiseaseGridPane.getLayoutY() + 35);
+        blueCountLabel.setMinHeight(20);
+        blueCountLabel.setMaxHeight(20);
+        blueCountLabel.setTextFill(Color.color(1, 1, 1));
+
+        GameController._gamePane.getChildren().add(newCityDiseaseGridPane);
+        GameController._gamePane.getChildren().add(redCountLabel);
+        GameController._gamePane.getChildren().add(yellowCountLabel);
+        GameController._gamePane.getChildren().add(blackCountLabel);
+        GameController._gamePane.getChildren().add(blueCountLabel);
     }
 
     public static void refreshDiseaseCubeCount() {

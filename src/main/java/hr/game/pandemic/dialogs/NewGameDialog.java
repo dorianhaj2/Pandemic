@@ -1,8 +1,8 @@
 package hr.game.pandemic.dialogs;
 
-import hr.game.pandemic.GameController;
 import hr.game.pandemic.model.GameState;
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 
@@ -24,6 +24,8 @@ public class NewGameDialog {
     private ToggleGroup difficulty;
     @FXML
     private ToggleGroup numberOfPlayers;
+    @FXML
+    private CheckBox cheatCheckBox;
 
     public void initialize(){
         diffEasy.setUserData(1);
@@ -32,7 +34,6 @@ public class NewGameDialog {
         numTwo.setUserData(2);
         numThree.setUserData(3);
         numFour.setUserData(4);
-
     }
 
     public void setDifficulty() {
@@ -46,4 +47,7 @@ public class NewGameDialog {
         GameState.NUMBER_OF_PLAYERS = numOfPlayers;
     }
 
+    public void setCheat() {
+        GameState.EASY_MODE = cheatCheckBox.isSelected();
+    }
 }

@@ -96,7 +96,7 @@ public class OtherActionUtils {
                     city.cureOneOfDisease(color);
                 }
             }
-            FXMLUtils.refreshCityButtonText(city);
+            FXMLUtils.refreshCityDiseases(city);
             FXMLUtils.refreshDiseaseCubeCount();
             MovementActionUtils.actionDone();
         }
@@ -188,13 +188,13 @@ public class OtherActionUtils {
     public static void onDiscoverACureButtonClick(Event event) {
 
         String colorsToShow = "";
-        if (ControlUtils.yellowCount > 4 || (ControlUtils.yellowCount > 3 && ControlUtils.currentPlayer instanceof Researcher))
+        if (ControlUtils.yellowCount > 4 || (ControlUtils.yellowCount > 3 && ControlUtils.currentPlayer instanceof Researcher) || GameState.EASY_MODE)
             colorsToShow += " yellow";
-        if (ControlUtils.blueCount > 4 || (ControlUtils.blueCount > 3 && ControlUtils.currentPlayer instanceof Researcher))
+        if (ControlUtils.blueCount > 4 || (ControlUtils.blueCount > 3 && ControlUtils.currentPlayer instanceof Researcher) || GameState.EASY_MODE)
             colorsToShow += " blue";
-        if (ControlUtils.redCount > 4 || (ControlUtils.redCount > 3 && ControlUtils.currentPlayer instanceof Researcher))
+        if (ControlUtils.redCount > 4 || (ControlUtils.redCount > 3 && ControlUtils.currentPlayer instanceof Researcher) || GameState.EASY_MODE)
             colorsToShow += " red";
-        if (ControlUtils.blackCount > 4 || (ControlUtils.blackCount > 3 && ControlUtils.currentPlayer instanceof Researcher))
+        if (ControlUtils.blackCount > 4 || (ControlUtils.blackCount > 3 && ControlUtils.currentPlayer instanceof Researcher) || GameState.EASY_MODE)
             colorsToShow += " black";
 
         String pickedColor = DialogUtils.showPickAColorDialog(colorsToShow);
@@ -215,7 +215,7 @@ public class OtherActionUtils {
                 }
             }
 
-            if (k > 4) {
+            if (k > 4 || GameState.EASY_MODE) {
                 for (CityCard c : cardsToDiscard) {
                     GameController.playerDiscardCard(ControlUtils.currentPlayer, c);
                 }
