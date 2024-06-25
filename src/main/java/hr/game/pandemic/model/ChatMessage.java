@@ -1,8 +1,17 @@
 package hr.game.pandemic.model;
 
+import jdk.jfr.DataAmount;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class ChatMessage {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ChatMessage implements Serializable {
     private String playerName;
     private LocalDateTime localDateTime;
     private String message;

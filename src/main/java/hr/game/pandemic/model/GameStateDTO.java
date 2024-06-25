@@ -2,6 +2,7 @@ package hr.game.pandemic.model;
 
 import hr.game.pandemic.GameController;
 import hr.game.pandemic.util.ControlUtils;
+import hr.game.pandemic.util.EventsUtils;
 import hr.game.pandemic.util.FXMLUtils;
 import hr.game.pandemic.util.UpdateGameBoardUtil;
 import javafx.application.Platform;
@@ -13,7 +14,6 @@ import java.util.List;
 public class GameStateDTO implements Serializable {
 
     private Integer NUMBER_OF_TURNS;
-    private Integer NUMBER_OF_ACTIONS;
     private Integer DIFFICULTY;
     private Integer NUMBER_OF_PLAYERS;
     private Integer OUTBREAK_COUNTER;
@@ -34,6 +34,7 @@ public class GameStateDTO implements Serializable {
     private boolean BLACK_ERADICATED;
     private boolean END_GAME;
     private boolean EASY_MODE;
+    private boolean oneQuietNightPlayed;
     private List<Player> players;
     private List<City> cities;
     public List<CityCard> infectionCardPile;
@@ -43,7 +44,6 @@ public class GameStateDTO implements Serializable {
 
     public GameStateDTO() {
         NUMBER_OF_TURNS = GameState.NUMBER_OF_TURNS;
-        NUMBER_OF_ACTIONS = GameState.NUMBER_OF_ACTIONS;
         DIFFICULTY = GameState.DIFFICULTY;
         NUMBER_OF_PLAYERS = GameState.NUMBER_OF_PLAYERS;
         OUTBREAK_COUNTER = GameState.OUTBREAK_COUNTER;
@@ -64,6 +64,7 @@ public class GameStateDTO implements Serializable {
         BLACK_ERADICATED = GameState.BLACK_ERADICATED;
         END_GAME = GameState.END_GAME;
         EASY_MODE = GameState.EASY_MODE;
+        oneQuietNightPlayed = EventsUtils.oneQuietNightPlayed;
         players = new ArrayList<>(GameController.players);
         cities = new ArrayList<>(GameController.cities);
         infectionCardPile = new ArrayList<>(GameController.infectionCardPile);
@@ -75,7 +76,6 @@ public class GameStateDTO implements Serializable {
     public void setGameState() {
         System.out.println(this);
         GameState.NUMBER_OF_TURNS = NUMBER_OF_TURNS;
-        GameState.NUMBER_OF_ACTIONS = NUMBER_OF_ACTIONS;
         GameState.DIFFICULTY = DIFFICULTY;
         GameState.NUMBER_OF_PLAYERS = NUMBER_OF_PLAYERS;
         GameState.OUTBREAK_COUNTER = OUTBREAK_COUNTER;
@@ -96,6 +96,7 @@ public class GameStateDTO implements Serializable {
         GameState.BLACK_ERADICATED = BLACK_ERADICATED;
         GameState.END_GAME = END_GAME;
         GameState.EASY_MODE = EASY_MODE;
+        EventsUtils.oneQuietNightPlayed = oneQuietNightPlayed;
         GameController.players = players;
         GameController.cities = cities;
         GameController.infectionCardPile =infectionCardPile;
@@ -117,6 +118,7 @@ public class GameStateDTO implements Serializable {
         FXMLUtils.moveInfectionRateToken();
         UpdateGameBoardUtil.updateBoard();
         UpdateGameBoardUtil.hideWaitToStartLabel();
+        ControlUtils.showPhaseOneControls();
         ControlUtils.showOrHideControlsDependingOnCurrentPlayer(false);
     }
 
@@ -124,7 +126,6 @@ public class GameStateDTO implements Serializable {
     public String toString() {
         return "GameStateDTO{" +
                 "NUMBER_OF_TURNS=" + NUMBER_OF_TURNS +
-                ", NUMBER_OF_ACTIONS=" + NUMBER_OF_ACTIONS +
                 ", DIFFICULTY=" + DIFFICULTY +
                 ", NUMBER_OF_PLAYERS=" + NUMBER_OF_PLAYERS +
                 ", OUTBREAK_COUNTER=" + OUTBREAK_COUNTER +

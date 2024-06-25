@@ -30,8 +30,10 @@ public class ControlUtils {
     public static int blackCount;
 
     public static void showOrHideControlsDependingOnCurrentPlayer(boolean disableHandCards) {
+        boolean playerInPlayerList = false;
         for (Player player : GameController.players) {
             if (player.getName().toUpperCase().equals(GameApplication.player.name())) {
+                playerInPlayerList = true;
                 if (currentPlayer == player){
                     showPhaseOneControls();
                 } else {
@@ -42,15 +44,16 @@ public class ControlUtils {
                 enableOrDisableAllPlayerHandCards(player.getName().charAt(6) - '0', true);
             }
         }
+        if (!playerInPlayerList) {
+            disableAllOtherControls("");
+        }
     }
 
     public static void startTurn() {
         GameState.NUMBER_OF_ACTIONS = 4;
     }
 
-    public static void showPhaseOneControls() { //Player player
-//        currentPlayer = player;
-        disableAllCityButtons();
+    public static void showPhaseOneControls() {
 
         controlGrid = (GridPane) FXMLUtils.getNodeById("controlGrid", GameController._gamePane);
         controlGrid.getChildren().clear();
@@ -300,8 +303,7 @@ public class ControlUtils {
     public static void enableAllCityButtonsExceptCurrentPlayer() {
         for (List<String> ls : GameController.citiesColors) {
             Button b = (Button) FXMLUtils.getNodeById(ls.getFirst(), GameController._gamePane);
-            if (!currentPlayer.getCurrentCity().equals(b.getId()))
-                b.setDisable(false);
+            b.setDisable(currentPlayer.getCurrentCity().equals(ls.getFirst()));
         }
     }
 

@@ -1,21 +1,28 @@
 package hr.game.pandemic;
 
+import hr.game.pandemic.jndi.ConfigurationKey;
+import hr.game.pandemic.jndi.ConfigurationReader;
 import hr.game.pandemic.model.*;
 import hr.game.pandemic.model.roles.Medic;
 import hr.game.pandemic.model.roles.QuarantineSpecialist;
 import hr.game.pandemic.model.roles.Researcher;
 import hr.game.pandemic.model.roles.Scientist;
+import hr.game.pandemic.rmi.RemoteService;
+import hr.game.pandemic.threads.RefreshChatThread;
 import hr.game.pandemic.util.*;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import org.json.simple.JSONArray;
@@ -23,17 +30,24 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.time.LocalDateTime;
+import java.util.*;
 
 
 public class GameController {
     private static final String SAVE_GAME_FILE_NAME = "files/save.bin";
     @FXML
     private Pane gamePane;
+    @FXML
+    private TextArea chatTextArea;
+    @FXML
+    private TextField chatTextInput;
     private static boolean SETUP;
+    private Label waitToStartLabel;
     public static Pane _gamePane;
     public static List<CityCard> infectionCardPile;
     public static List<CityCard> infectionDiscardPile;
@@ -45,8 +59,30 @@ public class GameController {
     public static List<City> cities = new ArrayList<>();
     public static List<List<String>> citiesColors = new ArrayList<>();
     private static List<String> outbreaksInCitiesInCurrentChain = new ArrayList<>();
+    private RemoteService service;
     public void initialize() throws InterruptedException {
         _gamePane = gamePane;
+
+        waitToStartLabel = new Label("Waiting for host to start the game...");
+        waitToStartLabel.setId("waitToStartLabel");
+        waitToStartLabel.setLayoutX(1560);
+        waitToStartLabel.setLayoutY(500);
+        waitToStartLabel.setVisible(false);
+        gamePane.getChildren().add(waitToStartLabel);
+
+        chatTextInput.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode().equals(KeyCode.ENTER)) {
+                    try {
+                        sendChatMessage();
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
         //Read cities and their corresponding colors from file
         try(BufferedReader br = new BufferedReader(new FileReader("files/cityColors.csv"))){
             String line;
@@ -91,31 +127,56 @@ public class GameController {
 
         while(GameState.DIFFICULTY == null)
             newGame();
+
+        Registry registry = null;
+        try {
+            Integer rmiPort = Integer.parseInt(ConfigurationReader.getValue(ConfigurationKey.RMI_PORT));
+            String rmiHost = ConfigurationReader.getValue(ConfigurationKey.RMI_HOST);
+            registry = LocateRegistry.getRegistry(rmiHost, rmiPort);
+            service = (RemoteService) registry.lookup(RemoteService.REMOTE_OBJECT_NAME);
+        } catch (RemoteException | NotBoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        new Thread(new RefreshChatThread(chatTextArea)).start();
+    }
+
+    public void sendChatMessage() throws RemoteException {
+        String chatMessageString = chatTextInput.getText();
+        ChatMessage newChatMessage = new ChatMessage(
+                GameApplication.player.name(),
+                LocalDateTime.now(),
+                chatMessageString);
+        chatTextInput.setText("");
+        service.sendMessage(newChatMessage);
     }
 
     public void cityButtonPressed(Event event) {
         if (event.getSource() instanceof Button b) {
             if (EventsUtils.governmentGrandPlayed){
-                City newResearchStationCity = GameController.cities.stream()
+                Optional<City> newResearchStationCityOptional = GameController.cities.stream()
                         .filter(c -> c.getName().equals(b.getId()))
-                        .findAny()
-                        .orElse(null);
-                newResearchStationCity.setResearchStation(true);
-                ControlUtils.citiesWithResearchStation.add(newResearchStationCity);
-                Button cityButton = (Button) FXMLUtils.getNodeById(newResearchStationCity.getName(), GameController._gamePane);
-                cityButton.getStyleClass().add("research_station");
-
+                        .findAny();
+                if (newResearchStationCityOptional.isPresent()) {
+                    City newResearchStationCity = newResearchStationCityOptional.get();
+                    newResearchStationCity.setResearchStation(true);
+                    ControlUtils.citiesWithResearchStation.add(newResearchStationCity);
+                    Button cityButton = (Button) FXMLUtils.getNodeById(newResearchStationCity.getName(), GameController._gamePane);
+                    cityButton.getStyleClass().add("research_station");
+                    GameApplication.client.sendGameState();
+                }
                 ControlUtils.disableAllCityButtons();
-                //ControlUtils.enableAllControls();
                 ControlUtils.showOrHideControlsDependingOnCurrentPlayer(false);
             } else if (EventsUtils.airliftPlayed) {
                 MovementActionUtils.moveCurrentPlayerToCity(b.getId());
                 setCurrentPlayerBasedOnNumberOfTurns();
                 EventsUtils.airliftPlayed = false;
-                //ControlUtils.enableAllControls();
+                ControlUtils.disableAllCityButtons();
                 ControlUtils.showOrHideControlsDependingOnCurrentPlayer(false);
+                GameApplication.client.sendGameState();
             } else {
                 MovementActionUtils.moveCurrentPlayerToCity(b.getId());
+                ControlUtils.disableAllCityButtons();
                 MovementActionUtils.actionDone();
             }
 
@@ -293,12 +354,7 @@ public class GameController {
             }
         } else {
                 GameState.DIFFICULTY = 1;
-                Label waitToStartLabel = new Label("Waiting for host to start the game...");
-                waitToStartLabel.setId("waitToStartLabel");
-                waitToStartLabel.setLayoutX(1560);
-                waitToStartLabel.setLayoutY(500);
-
-                gamePane.getChildren().add(waitToStartLabel);
+                waitToStartLabel.setVisible(true);
         }
 
     }

@@ -4,7 +4,7 @@ import hr.game.pandemic.GameController;
 import hr.game.pandemic.model.City;
 import hr.game.pandemic.model.GameState;
 import hr.game.pandemic.model.Player;
-import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -16,15 +16,22 @@ public class UpdateGameBoardUtil {
         updateCities();
         updateInfectionCardPiles();
         updatePlayerCardPiles();
-        updatePlayerHands();
+        updatePlayerHandsAndRoles();
         updateDiseaseCubeCountsAndCures();
         updatePlayerPositions();
     }
 
     private static void updateCities() {
         for (City city : GameController.cities) {
-//            Button cityButton = (Button) FXMLUtils.getNodeById(city.getName(), GameController._gamePane);
             FXMLUtils.refreshCityDiseases(city);
+            updateCityResearchStation(city);
+        }
+    }
+
+    private static void updateCityResearchStation(City city) {
+        Button cityButton = (Button) FXMLUtils.getNodeById(city.getName(), GameController._gamePane);
+        if(city.isResearchStation()) {
+            cityButton.getStyleClass().add("research_station");
         }
     }
 
@@ -36,7 +43,7 @@ public class UpdateGameBoardUtil {
         GameController.refreshPlayerDiscardPile();
     }
 
-    private static void updatePlayerHands() {
+    private static void updatePlayerHandsAndRoles() {
         GridPane playersGrid = (GridPane) FXMLUtils.getNodeById("playersGridPane", GameController._gamePane);
 
         if (playersGrid.getChildren().size() < GameState.NUMBER_OF_PLAYERS + 1) {
@@ -46,6 +53,7 @@ public class UpdateGameBoardUtil {
         }
         for (Player player : GameController.players) {
             GameController.refreshPlayerHand(player);
+            FXMLUtils.updatePlayerRole(player);
         }
 
     }

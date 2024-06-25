@@ -300,8 +300,6 @@ public class DialogUtils {
     }
 
     public static Player showPickYourselfOrAnotherPlayerDialog(Player eventPlayer) {
-        Player tmpPlayer = ControlUtils.currentPlayer;
-        ControlUtils.currentPlayer = eventPlayer;
         ButtonType you = new ButtonType("Yourself");
         ButtonType another = new ButtonType("Another player");
         ButtonType cancel = new ButtonType("Cancel");
@@ -313,14 +311,12 @@ public class DialogUtils {
         Player playerToMove = null;
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == you) {
-            playerToMove = ControlUtils.currentPlayer;
+            playerToMove = eventPlayer;
         } else if (result.get() == another) {
             playerToMove = showPickAnotherPlayerDialog("Pick a player to move.", false);
         } else if (result.get() == cancel) {
-            ControlUtils.currentPlayer = tmpPlayer;
             return null;
         }
-        ControlUtils.currentPlayer = tmpPlayer;
         return playerToMove;
     }
 

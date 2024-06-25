@@ -1,17 +1,17 @@
 package hr.game.pandemic;
 
 import hr.game.pandemic.exeption.WrongPlayerNameException;
-import hr.game.pandemic.model.GameState;
+import hr.game.pandemic.jndi.ConfigurationKey;
+import hr.game.pandemic.jndi.ConfigurationReader;
 import hr.game.pandemic.model.PlayerEnum;
 import hr.game.pandemic.networking.Client;
-import hr.game.pandemic.networking.ClientHandler;
 import hr.game.pandemic.networking.Server;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.EnumSet;
@@ -21,8 +21,8 @@ public class GameApplication extends Application {
     public static PlayerEnum player;
     private static int HEIGHT;
     private static int WIDTH;
-    public static final String HOST = "localhost";
-    public static final int PORT = 1989;
+    public static String HOST;
+    public static int PORT;
     public static Server server;
     public static Client client;
 
@@ -45,6 +45,9 @@ public class GameApplication extends Application {
     }
 
     public static void main(String[] args) throws IOException{
+
+        HOST = ConfigurationReader.getValue(ConfigurationKey.MULT_HOST);
+        PORT = Integer.parseInt(ConfigurationReader.getValue(ConfigurationKey.MULT_PORT));
 
         String firstArg = "";
         if(args.length > 0)

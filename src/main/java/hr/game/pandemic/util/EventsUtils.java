@@ -1,5 +1,6 @@
 package hr.game.pandemic.util;
 
+import hr.game.pandemic.GameApplication;
 import hr.game.pandemic.GameController;
 import hr.game.pandemic.model.CityCard;
 import hr.game.pandemic.model.EventCard;
@@ -23,9 +24,8 @@ public class EventsUtils {
 
     public static void onEventCardClick(Event event) {
         if (event.getSource() instanceof Button b) {
-            int playerNumber = b.getId().charAt(10) - '0';
-            playerNumber--;
-            onEventCardPlay((EventCard) b.getUserData(), GameController.players.get(playerNumber));
+            int playerIndex = b.getId().charAt(10) - '0' - 1;
+            onEventCardPlay((EventCard) b.getUserData(), GameController.players.get(playerIndex));
         }
     }
     public static void onEventCardPlay(EventCard eventCard, Player eventPlayer) {
@@ -39,8 +39,11 @@ public class EventsUtils {
             case "One Quiet Night" -> onOneQuietNightEventPlay();
         }
 
-        if (cardPlayed)
+        if (cardPlayed) {
             GameController.playerDiscardCard(eventPlayer, eventCard);
+            GameApplication.client.sendGameState();
+        }
+
     }
 
     public static void onForecastEventPlay() {

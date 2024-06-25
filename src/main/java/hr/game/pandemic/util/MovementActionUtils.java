@@ -26,7 +26,7 @@ public class MovementActionUtils {
             } else {
                 ControlUtils.disableAllCityButtons();
                 b.setText("Drive/Ferry");
-                ControlUtils.enableAllControls();
+                ControlUtils.showOrHideControlsDependingOnCurrentPlayer(false);
             }
         }
     }
@@ -66,18 +66,12 @@ public class MovementActionUtils {
             GameState.NUMBER_OF_ACTIONS--;
             Label actionCounterLabel = (Label) FXMLUtils.getNodeById("actCounter", GameController._gamePane);
             actionCounterLabel.setText("Actions: " + GameState.NUMBER_OF_ACTIONS);
-            ControlUtils.disableAllCityButtons();
-            ControlUtils.enableAllControls();
+
+            ControlUtils.showOrHideControlsDependingOnCurrentPlayer(false);
+            GameApplication.client.sendGameState();
 
             if (GameState.NUMBER_OF_ACTIONS == 0)
                 startPhaseTwo();
-//            ControlUtils.showCharterFlightAndBuildResearchStationButtonsIfPlayerHasCurrentCityCard();
-//            ControlUtils.showShuttleFlightButtonIfPlayerIsOnResearchStation();
-//            ControlUtils.showTreatDiseaseButton();
-//            ControlUtils.showShareKnowledgeButton();
-//            ControlUtils.showDiscoverCureButton();
-            ControlUtils.showOrHideControlsDependingOnCurrentPlayer(false);
-            GameApplication.client.sendGameState();
         }
     }
 
@@ -126,7 +120,6 @@ public class MovementActionUtils {
             if (!GameState.END_GAME){
                 GameController.drawInfectionCard();
                 GameController.infectCity(GameController.infectionDiscardPile.getLast().getName(), GameController.infectionDiscardPile.getLast().getColor(), 1);
-
             }
         }
         ControlUtils.passTurn();
@@ -159,7 +152,8 @@ public class MovementActionUtils {
             } else {
                 ControlUtils.disableAllCityButtons();
                 b.setText("Shuttle flight");
-                ControlUtils.enableAllControls();
+                //ControlUtils.enableAllControls();
+                ControlUtils.showOrHideControlsDependingOnCurrentPlayer(false);
             }
         }
     }

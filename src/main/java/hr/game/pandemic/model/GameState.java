@@ -2,7 +2,7 @@ package hr.game.pandemic.model;
 
 public class GameState {
     public static Integer NUMBER_OF_TURNS;
-    public static Integer NUMBER_OF_ACTIONS;
+    public static Integer NUMBER_OF_ACTIONS = 4;
     public static Integer DIFFICULTY;
     public static Integer NUMBER_OF_PLAYERS;
     public static Integer OUTBREAK_COUNTER;
@@ -27,7 +27,5 @@ public class GameState {
     public static int getCurrentPlayerNumber() {
         return (NUMBER_OF_TURNS % NUMBER_OF_PLAYERS) + 1;
     }
-
-
 
 }
