@@ -36,11 +36,11 @@ public class UpdateGameBoardUtil {
     }
 
     private static void updateInfectionCardPiles() {
-        GameController.refreshInfectionDiscardPile();
+        RefreshFXMLUtils.refreshInfectionDiscardPile();
     }
 
     private static void updatePlayerCardPiles() {
-        GameController.refreshPlayerDiscardPile();
+        RefreshFXMLUtils.refreshPlayerDiscardPile();
     }
 
     private static void updatePlayerHandsAndRoles() {
@@ -52,7 +52,7 @@ public class UpdateGameBoardUtil {
             }
         }
         for (Player player : GameController.players) {
-            GameController.refreshPlayerHand(player);
+            RefreshFXMLUtils.refreshPlayerHand(player);
             FXMLUtils.updatePlayerRole(player);
         }
 
@@ -100,8 +100,6 @@ public class UpdateGameBoardUtil {
 
     private static void updatePlayerPositions() {
         for (Player player : GameController.players) {
-            System.out.println(player.getName() + " current city: " + player.getCurrentCity());
-            System.out.println(player.getName() + " previous city: " + player.getPreviousCity());
             FXMLUtils.updatePlayerLocation(player);
         }
     }

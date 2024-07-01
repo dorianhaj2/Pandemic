@@ -3,7 +3,6 @@ package hr.game.pandemic.util;
 import hr.game.pandemic.GameApplication;
 import hr.game.pandemic.GameController;
 import hr.game.pandemic.model.*;
-import hr.game.pandemic.model.roles.Researcher;
 import javafx.event.Event;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -16,7 +15,6 @@ import javafx.scene.text.Font;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class ControlUtils {
 
@@ -34,7 +32,7 @@ public class ControlUtils {
         for (Player player : GameController.players) {
             if (player.getName().toUpperCase().equals(GameApplication.player.name())) {
                 playerInPlayerList = true;
-                if (currentPlayer == player){
+                if (currentPlayer == player && !EventsUtils.governmentGrandPlayed && !EventsUtils.airliftPlayed){
                     showPhaseOneControls();
                 } else {
                     disableAllOtherControls("");
@@ -82,11 +80,11 @@ public class ControlUtils {
         directFlightButton.setOnAction(MovementActionUtils::onDirectFlightButtonClick);
         controlGrid.add(directFlightButton, 2, 0);
 
-        showCharterFlightAndBuildResearchStationButtonsIfPlayerHasCurrentCityCard();
-        showShuttleFlightButtonIfPlayerIsOnResearchStation();
-        showTreatDiseaseButton();
-        showShareKnowledgeButton();
-        showDiscoverCureButton();
+        ShowActionControlsUtil.showCharterFlightAndBuildResearchStationButtonsIfPlayerHasCurrentCityCard();
+        ShowActionControlsUtil.showShuttleFlightButtonIfPlayerIsOnResearchStation();
+        ShowActionControlsUtil.showTreatDiseaseButton();
+        ShowActionControlsUtil.showShareKnowledgeButton();
+        ShowActionControlsUtil.showDiscoverCureButton();
 
         Button endTurnButton = new Button("End Turn");
         GridPane.setMargin(endTurnButton, new Insets(5, 5, 5, 5));
@@ -95,158 +93,10 @@ public class ControlUtils {
         controlGrid.add(endTurnButton, 4, 1);
     }
 
-    public static void showCharterFlightAndBuildResearchStationButtonsIfPlayerHasCurrentCityCard() {
-        controlGrid.getChildren().removeIf(node -> node.getId().equals("action3"));
-        controlGrid.getChildren().removeIf(node -> node.getId().equals("action5"));
-        for (Card c : currentPlayer.getHand()) {
-            if (c.getName().equals(currentPlayer.getCurrentCity())) {
-                Button charterFlightButton = new Button("Charter flight");
-                charterFlightButton.setUserData("Charter flight");
-                GridPane.setMargin(charterFlightButton, new Insets(5, 5, 5, 5));
-                charterFlightButton.setId("action3");
-                Tooltip charterFlightTooltip = new Tooltip("Discard the City card that matches the city you are in to move to any city.");
-                charterFlightButton.setTooltip(charterFlightTooltip);
-                charterFlightButton.setOnAction(MovementActionUtils::onCharterFlightButtonClick);
-                controlGrid.add(charterFlightButton, 3, 0);
-
-                City city = GameController.cities.stream()
-                        .filter(city1 -> city1.getName().equals(currentPlayer.getCurrentCity()))
-                        .findAny()
-                        .orElse(null);
-                if (!city.isResearchStation()) {
-                    Button buildResearchStationButton = new Button("Build research station");
-                    buildResearchStationButton.setUserData("Build research station");
-                    buildResearchStationButton.setWrapText(true);
-                    GridPane.setMargin(buildResearchStationButton, new Insets(5, 5, 5, 5));
-                    buildResearchStationButton.setId("action5");
-                    Tooltip buildResearchStationTooltip = new Tooltip("Discard the City card that matches the city you are in to place a research station there.");
-                    buildResearchStationButton.setTooltip(buildResearchStationTooltip);
-                    buildResearchStationButton.setOnAction(OtherActionUtils::onBuildResearchStationButtonClick);
-                    controlGrid.add(buildResearchStationButton, 0, 1);
-                }
-            }
-        }
-    }
-
-    public static void showShuttleFlightButtonIfPlayerIsOnResearchStation() {
-        controlGrid.getChildren().removeIf(node -> node.getId().equals("action4"));
-        boolean playerOnResearchStation = false;
-        for (City c : citiesWithResearchStation) {
-            if (currentPlayer.getCurrentCity().equals(c.getName())) {
-                playerOnResearchStation = true;
-                break;
-            }
-        }
-        if (playerOnResearchStation) {
-            Button shuttleFlightButton = new Button("Shuttle flight");
-            shuttleFlightButton.setUserData("Shuttle flight");
-            GridPane.setMargin(shuttleFlightButton, new Insets(5, 5, 5, 5));
-            shuttleFlightButton.setId("action4");
-            Tooltip shuttleFlightTooltip = new Tooltip("Move from a city with a research station to any other city that has a research station.");
-            shuttleFlightButton.setTooltip(shuttleFlightTooltip);
-            shuttleFlightButton.setOnAction(MovementActionUtils::onShuttleFlightButtonClick);
-            controlGrid.add(shuttleFlightButton, 4, 0);
-        }
-    }
-
-    public static void showTreatDiseaseButton() {
-        controlGrid.getChildren().removeIf(node -> node.getId().equals("action6"));
-        City currentCity = GameController.cities.stream()
-                .filter(c -> c.getName().equals(currentPlayer.getCurrentCity()))
-                .findAny()
-                .orElse(null);
-
-        if (!currentCity.getDiseases().isEmpty()) {
-            Button treatDiseaseButton = new Button("Treat disease");
-            treatDiseaseButton.setUserData("Treat disease");
-            GridPane.setMargin(treatDiseaseButton, new Insets(5, 5, 5, 5));
-            treatDiseaseButton.setId("action6");
-            Tooltip treatDiseaseTooltip = new Tooltip("Remove 1 disease cube from the city you are in, placing it in the cube supply " +
-                    "next to the board. If this disease color has been cured " +
-                    ", remove all cubes of that color from the city you are in.");
-            treatDiseaseButton.setTooltip(treatDiseaseTooltip);
-            treatDiseaseButton.setOnAction(OtherActionUtils::onTreatDiseaseButtonClick);
-            controlGrid.add(treatDiseaseButton, 1, 1);
-        }
-    }
-
-    public static void showShareKnowledgeButton() {
-        controlGrid.getChildren().removeIf(node -> node.getId().equals("action7"));
-        boolean twoPlayersOnSameCity = false;
-        playersOnCurrentCity = new ArrayList<>();
-        List<Player> playersWithCurrentCityCardOrAreResearchers = new ArrayList<>();
-        for (Player p : GameController.players) {
-            if (!p.equals(currentPlayer))
-                if (p.getCurrentCity().equals(currentPlayer.getCurrentCity())) {
-                    twoPlayersOnSameCity = true;
-                    playersOnCurrentCity.add(p);
-                    playersWithCurrentCityCardOrAreResearchers.add(p);
-                }
-        }
-        playersWithCurrentCityCardOrAreResearchers.add(currentPlayer);
-
-        if (twoPlayersOnSameCity) {
-            playersWithCurrentCityCardOrAreResearchers.removeIf(p -> p.getHand().stream().noneMatch(card -> card.getName().equals(currentPlayer.getCurrentCity())) && !(p instanceof Researcher));
-        }
-
-        if (!playersWithCurrentCityCardOrAreResearchers.isEmpty()) {
-            Button shareKnowledgeButton = new Button("Share Knowledge");
-            shareKnowledgeButton.setUserData(playersWithCurrentCityCardOrAreResearchers);
-            shareKnowledgeButton.setWrapText(true);
-            GridPane.setMargin(shareKnowledgeButton, new Insets(5, 5, 5, 5));
-            shareKnowledgeButton.setId("action7");
-            Tooltip shareKnowledgeTooltip = new Tooltip("You can do this action in two ways:\n" +
-                    "give the City card that matches the city you are in to another player, or\n" +
-                    "take the City card that matches the city you are in from another player.");
-            shareKnowledgeButton.setTooltip(shareKnowledgeTooltip);
-            shareKnowledgeButton.setOnAction(OtherActionUtils::onShareKnowledgeButtonClick);
-            controlGrid.add(shareKnowledgeButton, 2, 1);
-        }
-    }
-
-    public static void showDiscoverCureButton() {
-        controlGrid.getChildren().removeIf(node -> node.getId().equals("action8"));
-        yellowCount = 0;
-        blueCount = 0;
-        redCount = 0;
-        blackCount = 0;
-
-        for (Card c : currentPlayer.getHand()) {
-            if (c instanceof CityCard card) {
-                if (card.getColor().equals("yellow") && !   GameState.YELLOW_CURE)
-                    yellowCount++;
-                if (card.getColor().equals("blue") && !GameState.BLUE_CURE)
-                    blueCount++;
-                if (card.getColor().equals("red") && !GameState.RED_CURE)
-                    redCount++;
-                if (card.getColor().equals("black") && !GameState.BLUE_CURE)
-                    blackCount++;
-            }
-        }
-
-        Optional<City> currentCityOptional = GameController.cities.stream()
-                .filter(c -> c.getName().equals(currentPlayer.getCurrentCity()))
-                .findAny();
-
-        if (currentCityOptional.isPresent()) {
-            City currentCity = currentCityOptional.get();
-            if (((yellowCount > 4 || blueCount > 4 || redCount > 4 || blackCount > 4) && currentCity.isResearchStation()) || GameState.EASY_MODE) {
-                Button discoverACureButton = new Button("Discover a Cure");
-                discoverACureButton.setWrapText(true);
-                GridPane.setMargin(discoverACureButton, new Insets(5, 5, 5, 5));
-                discoverACureButton.setId("action8");
-                Tooltip discoverACureTooltip = new Tooltip("At any research station, discard 5 City cards of the same color from your hand to cure the disease of that color.");
-                discoverACureButton.setTooltip(discoverACureTooltip);
-                discoverACureButton.setOnAction(OtherActionUtils::onDiscoverACureButtonClick);
-                controlGrid.add(discoverACureButton, 3, 1);
-            }
-        }
-    }
-
     public static void passTurn() {
         if (!GameState.END_GAME){
             GameState.NUMBER_OF_TURNS++;
-            GameController.setCurrentPlayerBasedOnNumberOfTurns();
+            setCurrentPlayerBasedOnNumberOfTurns();
             showOrHideControlsDependingOnCurrentPlayer(false);
             startTurn();
             GameApplication.client.sendGameState();
@@ -273,15 +123,6 @@ public class ControlUtils {
         for (Node node : allActions) {
             if (node instanceof Button b)
                 b.setDisable(disable);
-        }
-    }
-
-    public static void enableAllControls() {
-        List<Node> allActions = FXMLUtils.getNodesByIdStartsWith("action", GameController._gamePane);
-
-        for (Node node : allActions) {
-            Button b = (Button) node;
-            b.setDisable(false);
         }
     }
 
@@ -321,5 +162,9 @@ public class ControlUtils {
                 b.setDisable(false);
             }
         }
+    }
+
+    public static void setCurrentPlayerBasedOnNumberOfTurns() {
+        currentPlayer = GameController.players.get(GameState.getCurrentPlayerNumber() - 1);
     }
 }

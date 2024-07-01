@@ -6,6 +6,7 @@ import hr.game.pandemic.jndi.ConfigurationReader;
 import hr.game.pandemic.model.PlayerEnum;
 import hr.game.pandemic.networking.Client;
 import hr.game.pandemic.networking.Server;
+import hr.game.pandemic.rmi.RMIServer;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -74,6 +75,7 @@ public class GameApplication extends Application {
             ServerSocket serverSocket = new ServerSocket(GameApplication.PORT);
             server = new Server(serverSocket);
             server.startServer();
+            RMIServer.startRMIServer();
         } else {
             Socket socket = new Socket(GameApplication.HOST, GameApplication.PORT);
             client = new Client(socket);
@@ -81,9 +83,10 @@ public class GameApplication extends Application {
         }
 
         launch();
-
-
     }
 
+    public static void stopServer() {
+        server.closeServerSocket();
+    }
 
 }

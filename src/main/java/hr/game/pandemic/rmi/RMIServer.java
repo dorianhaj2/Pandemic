@@ -12,7 +12,7 @@ public class RMIServer {
 
     private static final int RANDOM_PORT_HINT = 0;
 
-    public static void main(String[] args) {
+    public static void startRMIServer() {
         try {
             Integer rmiPort = Integer.parseInt(ConfigurationReader.getValue(ConfigurationKey.RMI_PORT));
             Registry registry = LocateRegistry.createRegistry(rmiPort);
@@ -23,6 +23,5 @@ public class RMIServer {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-
     }
 }

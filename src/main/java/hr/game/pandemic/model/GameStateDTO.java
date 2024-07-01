@@ -74,7 +74,6 @@ public class GameStateDTO implements Serializable {
     }
 
     public void setGameState() {
-        System.out.println(this);
         GameState.NUMBER_OF_TURNS = NUMBER_OF_TURNS;
         GameState.DIFFICULTY = DIFFICULTY;
         GameState.NUMBER_OF_PLAYERS = NUMBER_OF_PLAYERS;
@@ -103,7 +102,7 @@ public class GameStateDTO implements Serializable {
         GameController.infectionDiscardPile = infectionDiscardPile;
         GameController.playerCardPile = playerCardPile;
         GameController.playerDiscardPile = playerDiscardPile;
-        GameController.setCurrentPlayerBasedOnNumberOfTurns();
+        ControlUtils.setCurrentPlayerBasedOnNumberOfTurns();
 
         Platform.runLater(new Runnable() {
             @Override

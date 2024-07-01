@@ -4,7 +4,6 @@ import hr.game.pandemic.GameApplication;
 import hr.game.pandemic.GameController;
 import hr.game.pandemic.dialogs.NewGameDialog;
 import hr.game.pandemic.model.*;
-import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -14,13 +13,11 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 public class DialogUtils {
 
-    private static GridPane pickGrid;
+    public static GridPane pickGrid;
 
     public static boolean showNewGameDialog(){
         try {
@@ -51,116 +48,7 @@ public class DialogUtils {
         return false;
     }
 
-    public static Card showPickACardDialog(Player player, String cardType, String title) {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(GameApplication.class.getResource("dialog_fxmls/pick-a-card-dialog.fxml"));
-            DialogPane pickACardDialogPane = fxmlLoader.load();
-            pickACardDialogPane.getStylesheets().add(DialogUtils.class.getResource("/hr/game/pandemic/stylesheets/cardButtons.css").toExternalForm());
-
-            Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setTitle(title);
-
-            List<Card> cards = new ArrayList<>();
-
-            for (Card c : player.getHand()) {
-                if (cardType.contains("city") || cardType.equals("all")) {
-                    if (c instanceof CityCard cc) {
-                        if (cardType.contains("yellow")){
-                            if (cc.getColor().equals("yellow"))
-                                cards.add(c);
-                        } else if (cardType.contains("blue")) {
-                            if (cc.getColor().equals("blue"))
-                                cards.add(c);
-                        } else if (cardType.contains("red")) {
-                            if (cc.getColor().equals("red"))
-                                cards.add(c);
-                        } else if (cardType.contains("black")) {
-                            if (cc.getColor().equals("black"))
-                                cards.add(c);
-                        } else
-                            cards.add(c);
-                    }
-                }
-                if (cardType.contains("event") || cardType.equals("all")) {
-                    if (c instanceof EventCard) {
-                        cards.add(c);
-                    }
-                }
-                if (c.getName().equals(cardType)) {
-                    cards.add(c);
-                }
-            }
-            pickGrid = (GridPane) FXMLUtils.getNodeById("pickACardGridPane", pickACardDialogPane);
-
-            for (int i = 0; i < cards.size(); i++) {
-                Card tmpCard = cards.get(i);
-                Button tmpButton = new Button(tmpCard.getName().substring(0, 1).toUpperCase() + tmpCard.getName().substring(1));
-                GridPane.setMargin(tmpButton, new Insets(10, 10, 10, 10));
-                tmpButton.setUserData(tmpCard);
-                tmpButton.setId(player.getName().toLowerCase().substring(0, player.getName().length()-1) + "Card" + player.getName().charAt(player.getName().length() - 1) + tmpCard.getName());
-                tmpButton.setCursor(Cursor.HAND);
-                tmpButton.setOnAction(DialogUtils::pickACardButtonClick);
-                GridPane.setHalignment(tmpButton, HPos.CENTER);
-                if (tmpCard instanceof CityCard cc) {
-                    tmpButton.getStyleClass().add("card" + cc.getColor().substring(0, 1).toUpperCase() + cc.getColor().substring(1));
-                } else if (tmpCard instanceof EventCard) {
-                    tmpButton.getStyleClass().add("cardEvent");
-                    tmpButton.setUserData(tmpCard);
-                    tmpButton.setOnAction(EventsUtils::onEventCardClick);
-                }
-                pickGrid.add(tmpButton, i%5, i/5);
-            }
-
-            dialog.setDialogPane(pickACardDialogPane);
-
-            Optional<ButtonType> clickedButton = dialog.showAndWait();
-
-            if(clickedButton.isPresent())
-                if(clickedButton.get() == ButtonType.OK) {
-                    Button pickedCard = (Button) getNodeByCoordinate(pickGrid, 2, 1);
-                    if (pickedCard != null) {
-                        return (Card) pickedCard.getUserData();
-                    } else
-                        return null;
-                } else if (clickedButton.get() == ButtonType.CANCEL) {
-                    return null;
-                }
-
-        }  catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-    private static void pickACardButtonClick(Event event) {
-        if (event.getSource() instanceof Button b) {
-            int bRow = GridPane.getRowIndex(b);
-            int bColumn = GridPane.getColumnIndex(b);
-            Button prevPickedButton = (Button) getNodeByCoordinate(pickGrid, 2, 1);
-            if (prevPickedButton != null){
-                GridPane.setColumnIndex(prevPickedButton, bColumn);
-                GridPane.setRowIndex(prevPickedButton, bRow);
-            }
-            GridPane.setColumnIndex(b, 1);
-            GridPane.setRowIndex(b, 2);
-        }
-    }
-
-    private static void pickAnInfectionCardButtonClick(Event event) {
-        if (event.getSource() instanceof Button b) {
-            int bRow = GridPane.getRowIndex(b);
-            int bColumn = GridPane.getColumnIndex(b);
-            Button prevPickedButton = (Button) getNodeByCoordinate(pickGrid, 6, 1);
-            if (prevPickedButton != null){
-                GridPane.setColumnIndex(prevPickedButton, bColumn);
-                GridPane.setRowIndex(prevPickedButton, bRow);
-            }
-            GridPane.setColumnIndex(b, 1);
-            GridPane.setRowIndex(b, 6);
-        }
-    }
-
-    private static Node getNodeByCoordinate(GridPane gridLayout, int row, int column) {
+    public static Node getNodeByCoordinate(GridPane gridLayout, int row, int column) {
         for (Node node : gridLayout.getChildren()) {
             if(GridPane.getRowIndex(node) == row && GridPane.getColumnIndex(node) == column){
                 return node;
@@ -187,7 +75,7 @@ public class DialogUtils {
                 tmpButton.setUserData(tmpCity);
                 tmpButton.setId(tmpCity.getName() + "ResearchStation");
                 tmpButton.setCursor(Cursor.HAND);
-                tmpButton.setOnAction(DialogUtils::pickACardButtonClick);
+                tmpButton.setOnAction(CardDialogUtils::pickACardButtonClick);
                 GridPane.setHalignment(tmpButton, HPos.CENTER);
 
                 tmpButton.getStyleClass().add("card" + tmpCity.getColor().substring(0, 1).toUpperCase() + tmpCity.getColor().substring(1));
@@ -217,264 +105,6 @@ public class DialogUtils {
         return null;
     }
 
-    public static String showPickADiseaseToTreat() {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(GameApplication.class.getResource("dialog_fxmls/pick-a-card-dialog.fxml"));
-            DialogPane pickACardDialogPane = fxmlLoader.load();
-            pickACardDialogPane.getStylesheets().add(DialogUtils.class.getResource("/hr/game/pandemic/stylesheets/cardButtons.css").toExternalForm());
-
-            Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setTitle("Pick a disease color you want to treat.");
-
-            pickGrid = (GridPane) FXMLUtils.getNodeById("pickACardGridPane", pickACardDialogPane);
-
-            City currentCity = GameController.cities.stream()
-                    .filter(c -> c.getName().equals(ControlUtils.currentPlayer.getCurrentCity()))
-                    .findAny()
-                    .orElse(null);
-            int k = 0;
-            if (currentCity.getDiseases().contains("yellow")) {
-                Button yellowButton = new Button("Yellow");
-                yellowButton.getStyleClass().add("cardYellow");
-                GridPane.setMargin(yellowButton, new Insets(10, 10, 10, 10));
-                yellowButton.setCursor(Cursor.HAND);
-                yellowButton.setOnAction(DialogUtils::pickACardButtonClick);
-                GridPane.setHalignment(yellowButton, HPos.CENTER);
-
-                pickGrid.add(yellowButton, k%4, k/4);
-                k++;
-            }
-            if (currentCity.getDiseases().contains("blue")) {
-                Button yellowButton = new Button("Blue");
-                yellowButton.getStyleClass().add("cardBlue");
-                GridPane.setMargin(yellowButton, new Insets(10, 10, 10, 10));
-                yellowButton.setCursor(Cursor.HAND);
-                yellowButton.setOnAction(DialogUtils::pickACardButtonClick);
-                GridPane.setHalignment(yellowButton, HPos.CENTER);
-
-                pickGrid.add(yellowButton, k%4, k/4);
-                k++;
-            }
-            if (currentCity.getDiseases().contains("red")) {
-                Button yellowButton = new Button("Red");
-                yellowButton.getStyleClass().add("cardRed");
-                GridPane.setMargin(yellowButton, new Insets(10, 10, 10, 10));
-                yellowButton.setCursor(Cursor.HAND);
-                yellowButton.setOnAction(DialogUtils::pickACardButtonClick);
-                GridPane.setHalignment(yellowButton, HPos.CENTER);
-
-                pickGrid.add(yellowButton, k%4, k/4);
-                k++;
-            }
-            if (currentCity.getDiseases().contains("black")) {
-                Button yellowButton = new Button("Black");
-                yellowButton.getStyleClass().add("cardBlack");
-                GridPane.setMargin(yellowButton, new Insets(10, 10, 10, 10));
-                yellowButton.setCursor(Cursor.HAND);
-                yellowButton.setOnAction(DialogUtils::pickACardButtonClick);
-                GridPane.setHalignment(yellowButton, HPos.CENTER);
-
-                pickGrid.add(yellowButton, k%4, k/4);
-            }
-
-            dialog.setDialogPane(pickACardDialogPane);
-
-            Optional<ButtonType> clickedButton = dialog.showAndWait();
-
-            if(clickedButton.isPresent())
-                if(clickedButton.get() == ButtonType.OK) {
-                    Button pickedColor = (Button) getNodeByCoordinate(pickGrid, 2, 1);
-                    if (pickedColor != null) {
-                        return pickedColor.getText().toLowerCase();
-                    } else
-                        return null;
-                } else if (clickedButton.get() == ButtonType.CANCEL) {
-                    return null;
-                }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public static Player showPickYourselfOrAnotherPlayerDialog(Player eventPlayer) {
-        ButtonType you = new ButtonType("Yourself");
-        ButtonType another = new ButtonType("Another player");
-        ButtonType cancel = new ButtonType("Cancel");
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Yourself or another");
-        alert.setHeaderText("Choose to move yourself or another player.");
-        alert.getButtonTypes().setAll(you, another, cancel);
-
-        Player playerToMove = null;
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == you) {
-            playerToMove = eventPlayer;
-        } else if (result.get() == another) {
-            playerToMove = showPickAnotherPlayerDialog("Pick a player to move.", false);
-        } else if (result.get() == cancel) {
-            return null;
-        }
-        return playerToMove;
-    }
-
-    public static Player showPickAnotherPlayerDialog(String title, boolean currentCityOnly, List<Player> players) {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(GameApplication.class.getResource("dialog_fxmls/pick-a-card-dialog.fxml"));
-            DialogPane pickACardDialogPane = fxmlLoader.load();
-            pickACardDialogPane.getStylesheets().add(DialogUtils.class.getResource("/hr/game/pandemic/stylesheets/cardButtons.css").toExternalForm());
-
-            Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setTitle(title);
-
-            pickGrid = (GridPane) FXMLUtils.getNodeById("pickACardGridPane", pickACardDialogPane);
-
-            List<Player> playersToGet;
-            if (players != null) {
-                playersToGet = players;
-            } else if (currentCityOnly) {
-                playersToGet = ControlUtils.playersOnCurrentCity;
-            } else {
-                playersToGet = GameController.players;
-            }
-            for (int i = 0; i < playersToGet.size(); i++) {
-                Player player = playersToGet.get(i);
-                if (!player.equals(ControlUtils.currentPlayer)) {
-                    Button tmpButton = new Button(player.getName().substring(0, 1).toUpperCase() + player.getName().substring(1));
-                    GridPane.setMargin(tmpButton, new Insets(10, 10, 10, 10));
-                    tmpButton.setUserData(player);
-                    tmpButton.setCursor(Cursor.HAND);
-                    tmpButton.setOnAction(DialogUtils::pickACardButtonClick);
-                    GridPane.setHalignment(tmpButton, HPos.CENTER);
-                    pickGrid.add(tmpButton, i%4, i/4);
-                }
-            }
-
-            dialog.setDialogPane(pickACardDialogPane);
-
-            Optional<ButtonType> clickedButton = dialog.showAndWait();
-
-            if(clickedButton.isPresent())
-                if(clickedButton.get() == ButtonType.OK) {
-                    Button pickedPlayer = (Button) getNodeByCoordinate(pickGrid, 2, 1);
-                    if (pickedPlayer != null) {
-                        return (Player) pickedPlayer.getUserData();
-                    } else
-                        return null;
-                } else if (clickedButton.get() == ButtonType.CANCEL) {
-                    return null;
-                }
-
-        }  catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public static Player showPickAnotherPlayerDialog(String title, boolean currentCityOnly) {
-        return showPickAnotherPlayerDialog(title, currentCityOnly, null);
-    }
-
-    public static boolean showTakeCardConfirmationDialog(Player player) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Are you sure?");
-        alert.setHeaderText("Take card from " + player.getName() + "?");
-
-
-        Optional<ButtonType> option = alert.showAndWait();
-        return ButtonType.OK.equals(option.get());
-    }
-
-    public static boolean showTakeCardOrGiveCardDialog() {
-        ButtonType take = new ButtonType("Take", ButtonBar.ButtonData.CANCEL_CLOSE);
-        ButtonType give = new ButtonType("Give", ButtonBar.ButtonData.CANCEL_CLOSE);
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Do you want to give a card to a player or take a card from a player?", take, give);
-        //alert.setTitle("Do you want to give a card to a player or take a card from a player?");
-
-        Optional<ButtonType> option = alert.showAndWait();
-        return take.equals(option.get());
-    }
-
-    public static String showPickAColorDialog(String colorsToShow) {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(GameApplication.class.getResource("dialog_fxmls/pick-a-card-dialog.fxml"));
-            DialogPane pickACardDialogPane = fxmlLoader.load();
-            pickACardDialogPane.getStylesheets().add(DialogUtils.class.getResource("/hr/game/pandemic/stylesheets/cardButtons.css").toExternalForm());
-
-            Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setTitle("Pick a color.");
-
-            pickGrid = (GridPane) FXMLUtils.getNodeById("pickACardGridPane", pickACardDialogPane);
-
-            int k = 0;
-            if (colorsToShow.contains("yellow")) {
-                Button yellowButton = new Button("Yellow");
-                yellowButton.getStyleClass().add("cardYellow");
-                GridPane.setMargin(yellowButton, new Insets(10, 10, 10, 10));
-                yellowButton.setCursor(Cursor.HAND);
-                yellowButton.setOnAction(DialogUtils::pickACardButtonClick);
-                GridPane.setHalignment(yellowButton, HPos.CENTER);
-
-                pickGrid.add(yellowButton, k%4, k/4);
-                k++;
-            }
-            if (colorsToShow.contains("blue")) {
-                Button yellowButton = new Button("Blue");
-                yellowButton.getStyleClass().add("cardBlue");
-                GridPane.setMargin(yellowButton, new Insets(10, 10, 10, 10));
-                yellowButton.setCursor(Cursor.HAND);
-                yellowButton.setOnAction(DialogUtils::pickACardButtonClick);
-                GridPane.setHalignment(yellowButton, HPos.CENTER);
-
-                pickGrid.add(yellowButton, k%4, k/4);
-                k++;
-            }
-            if (colorsToShow.contains("red")) {
-                Button yellowButton = new Button("Red");
-                yellowButton.getStyleClass().add("cardRed");
-                GridPane.setMargin(yellowButton, new Insets(10, 10, 10, 10));
-                yellowButton.setCursor(Cursor.HAND);
-                yellowButton.setOnAction(DialogUtils::pickACardButtonClick);
-                GridPane.setHalignment(yellowButton, HPos.CENTER);
-
-                pickGrid.add(yellowButton, k%4, k/4);
-                k++;
-            }
-            if (colorsToShow.contains("black")) {
-                Button yellowButton = new Button("Black");
-                yellowButton.getStyleClass().add("cardBlack");
-                GridPane.setMargin(yellowButton, new Insets(10, 10, 10, 10));
-                yellowButton.setCursor(Cursor.HAND);
-                yellowButton.setOnAction(DialogUtils::pickACardButtonClick);
-                GridPane.setHalignment(yellowButton, HPos.CENTER);
-
-                pickGrid.add(yellowButton, k%4, k/4);
-            }
-
-            dialog.setDialogPane(pickACardDialogPane);
-
-            Optional<ButtonType> clickedButton = dialog.showAndWait();
-
-            if(clickedButton.isPresent())
-                if(clickedButton.get() == ButtonType.OK) {
-                    Button pickedColor = (Button) getNodeByCoordinate(pickGrid, 2, 1);
-                    if (pickedColor != null) {
-                        return pickedColor.getText().toLowerCase();
-                    } else
-                        return null;
-                } else if (clickedButton.get() == ButtonType.CANCEL) {
-                    return null;
-                }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     public static CityCard showPickAnInfectionCardDialog() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(GameApplication.class.getResource("dialog_fxmls/pick-an-infection-card-dialog.fxml"));
@@ -493,7 +123,7 @@ public class DialogUtils {
                 tmpButton.setUserData(tmpCard);
                 tmpButton.setId(tmpCard.getName());
                 tmpButton.setCursor(Cursor.HAND);
-                tmpButton.setOnAction(DialogUtils::pickAnInfectionCardButtonClick);
+                tmpButton.setOnAction(CardDialogUtils::pickAnInfectionCardButtonClick);
                 GridPane.setHalignment(tmpButton, HPos.CENTER);
 
                 tmpButton.getStyleClass().add("card" + tmpCard.getColor().substring(0, 1).toUpperCase() + tmpCard.getColor().substring(1));

@@ -1,13 +1,10 @@
 package hr.game.pandemic.networking;
 
 import hr.game.pandemic.GameApplication;
-import hr.game.pandemic.GameController;
 import hr.game.pandemic.model.GameStateDTO;
-import javafx.application.Platform;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Arrays;
 
 public class Client {
     private Socket socket;

@@ -77,15 +77,15 @@ public class MovementActionUtils {
 
     public static void startPhaseTwo() {
         if (!GameState.END_GAME) {
-            boolean drawnEpidemic = GameController.playerDrawCard(ControlUtils.currentPlayer);
+            boolean drawnEpidemic = DrawDiscardUtil.playerDrawCard(ControlUtils.currentPlayer);
             if (drawnEpidemic)
                 onEpidemicCardDraw();
-            boolean drawnSecondEpidemic = GameController.playerDrawCard(ControlUtils.currentPlayer);
+            boolean drawnSecondEpidemic = DrawDiscardUtil.playerDrawCard(ControlUtils.currentPlayer);
 
             if (drawnSecondEpidemic) {
                 onEpidemicCardDraw();
             }
-            GameController.checkIfPlayerHasTooManyCards(ControlUtils.currentPlayer);
+            DrawDiscardUtil.checkIfPlayerHasTooManyCards(ControlUtils.currentPlayer);
             startPhaseThree();
         }
     }
@@ -101,7 +101,7 @@ public class MovementActionUtils {
             CityCard drawnCard = GameController.infectionCardPile.getLast();
             GameController.infectionCardPile.removeLast();
             GameController.infectionDiscardPile.add(drawnCard);
-            GameController.infectCity(drawnCard.getName(), drawnCard.getColor(), 3);
+            InfectUtil.infectCity(drawnCard.getName(), drawnCard.getColor(), 3);
             //3. Intensify
             Collections.shuffle(GameController.infectionDiscardPile);
             GameController.infectionCardPile.addAll(GameController.infectionDiscardPile);
@@ -118,28 +118,28 @@ public class MovementActionUtils {
             amountOfInfectionCardsToDraw++;
         for (int i = 0; i < amountOfInfectionCardsToDraw; i++) {
             if (!GameState.END_GAME){
-                GameController.drawInfectionCard();
-                GameController.infectCity(GameController.infectionDiscardPile.getLast().getName(), GameController.infectionDiscardPile.getLast().getColor(), 1);
+                DrawDiscardUtil.drawInfectionCard();
+                InfectUtil.infectCity(GameController.infectionDiscardPile.getLast().getName(), GameController.infectionDiscardPile.getLast().getColor(), 1);
             }
         }
         ControlUtils.passTurn();
     }
 
     public static void onDirectFlightButtonClick(Event event) {
-        CityCard discardedCity = (CityCard) DialogUtils.showPickACardDialog(ControlUtils.currentPlayer, "city", "Discard a city card to move to that city");
+        CityCard discardedCity = (CityCard) CardDialogUtils.showPickACardDialog(ControlUtils.currentPlayer, "city", "Discard a city card to move to that city");
         if (discardedCity != null) {
             moveCurrentPlayerToCity(discardedCity.getName());
-            GameController.playerDiscardCard(ControlUtils.currentPlayer, discardedCity);
+            DrawDiscardUtil.playerDiscardCard(ControlUtils.currentPlayer, discardedCity);
             actionDone();
         }
     }
 
     public static void onCharterFlightButtonClick(Event event) {
-        CityCard discardedCity = (CityCard) DialogUtils.showPickACardDialog(ControlUtils.currentPlayer, ControlUtils.currentPlayer.getCurrentCity(), "Discard the City card that matches the city you are in to move to any city.");
+        CityCard discardedCity = (CityCard) CardDialogUtils.showPickACardDialog(ControlUtils.currentPlayer, ControlUtils.currentPlayer.getCurrentCity(), "Discard the City card that matches the city you are in to move to any city.");
         if (discardedCity != null) {
             ControlUtils.enableAllCityButtonsExceptCurrentPlayer();
             ControlUtils.disableAllOtherControls("");
-            GameController.playerDiscardCard(ControlUtils.currentPlayer, discardedCity);
+            DrawDiscardUtil.playerDiscardCard(ControlUtils.currentPlayer, discardedCity);
         }
     }
 
@@ -152,9 +152,40 @@ public class MovementActionUtils {
             } else {
                 ControlUtils.disableAllCityButtons();
                 b.setText("Shuttle flight");
-                //ControlUtils.enableAllControls();
                 ControlUtils.showOrHideControlsDependingOnCurrentPlayer(false);
             }
         }
     }
+
+    public static void clickCity(Button b) {
+            if (EventsUtils.governmentGrandPlayed){
+                Optional<City> newResearchStationCityOptional = GameController.cities.stream()
+                        .filter(c -> c.getName().equals(b.getId()))
+                        .findAny();
+                if (newResearchStationCityOptional.isPresent()) {
+                    City newResearchStationCity = newResearchStationCityOptional.get();
+                    newResearchStationCity.setResearchStation(true);
+                    ControlUtils.citiesWithResearchStation.add(newResearchStationCity);
+                    Button cityButton = (Button) FXMLUtils.getNodeById(newResearchStationCity.getName(), GameController._gamePane);
+                    cityButton.getStyleClass().add("research_station");
+                    EventsUtils.governmentGrandPlayed = false;
+                    ControlUtils.showOrHideControlsDependingOnCurrentPlayer(false);
+                    GameApplication.client.sendGameState();
+                }
+                ControlUtils.disableAllCityButtons();
+                ControlUtils.showOrHideControlsDependingOnCurrentPlayer(false);
+            } else if (EventsUtils.airliftPlayed) {
+                MovementActionUtils.moveCurrentPlayerToCity(b.getId());
+                ControlUtils.setCurrentPlayerBasedOnNumberOfTurns();
+                EventsUtils.airliftPlayed = false;
+                ControlUtils.disableAllCityButtons();
+                ControlUtils.showOrHideControlsDependingOnCurrentPlayer(false);
+                GameApplication.client.sendGameState();
+            } else {
+                MovementActionUtils.moveCurrentPlayerToCity(b.getId());
+                ControlUtils.disableAllCityButtons();
+                MovementActionUtils.actionDone();
+            }
+    }
+
 }

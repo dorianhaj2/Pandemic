@@ -40,9 +40,10 @@ public class EventsUtils {
         }
 
         if (cardPlayed) {
-            GameController.playerDiscardCard(eventPlayer, eventCard);
+            DrawDiscardUtil.playerDiscardCard(eventPlayer, eventCard);
             GameApplication.client.sendGameState();
         }
+
 
     }
 
@@ -61,7 +62,7 @@ public class EventsUtils {
         Collections.reverse(removedCards);
 
         while (k <= 6) {
-            CityCard pickedCard = (CityCard) DialogUtils.showPickACardDialog(tmpPlayer, "city", "Pick card number 1. (1 - bottom, 6 - top)");
+            CityCard pickedCard = (CityCard) CardDialogUtils.showPickACardDialog(tmpPlayer, "city", "Pick card number 1. (1 - bottom, 6 - top)");
             if (pickedCard != null) {
                 rearrangedCards.add(pickedCard);
                 tmpPlayer.removeCardFromHand(pickedCard);
@@ -77,7 +78,7 @@ public class EventsUtils {
     }
 
     public static void onAirliftEventPlay(Player eventPlayer) {
-        Player pickedPlayer = DialogUtils.showPickYourselfOrAnotherPlayerDialog(eventPlayer);
+        Player pickedPlayer = PlayerDialogUtil.showPickYourselfOrAnotherPlayerDialog(eventPlayer);
         if (pickedPlayer != null) {
             airliftPlayed = true;
             ControlUtils.currentPlayer = pickedPlayer;
@@ -92,7 +93,7 @@ public class EventsUtils {
         CityCard cardToRemove = DialogUtils.showPickAnInfectionCardDialog();
         if (cardToRemove != null) {
             GameController.infectionDiscardPile.remove(cardToRemove);
-            GameController.refreshInfectionDiscardPile();
+            RefreshFXMLUtils.refreshInfectionDiscardPile();
             cardPlayed = true;
         }
     }

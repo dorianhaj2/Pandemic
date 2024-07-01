@@ -1,8 +1,6 @@
 package hr.game.pandemic.networking;
 
-import hr.game.pandemic.GameApplication;
 import hr.game.pandemic.model.GameStateDTO;
-import hr.game.pandemic.model.PlayerEnum;
 
 import java.io.*;
 import java.net.Socket;
