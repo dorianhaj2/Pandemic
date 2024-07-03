@@ -22,6 +22,8 @@ public class GameState {
     public static boolean BLUE_ERADICATED;
     public static boolean BLACK_ERADICATED;
     public static boolean END_GAME;
+    public static boolean WIN;
+    public static String reason;
     public static boolean EASY_MODE;
 
     public static int getCurrentPlayerNumber() {

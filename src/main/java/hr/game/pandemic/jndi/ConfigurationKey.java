@@ -8,7 +8,7 @@ public enum ConfigurationKey {
 
     private String key;
 
-    private ConfigurationKey(String key) {
+    ConfigurationKey(String key) {
         this.key = key;
     }
 }

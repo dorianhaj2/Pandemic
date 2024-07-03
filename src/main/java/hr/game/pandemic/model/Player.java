@@ -13,14 +13,12 @@ public class Player implements Serializable {
 
     private String name;
     private List<Card> hand;
-    private String previousCity;
     private String currentCity;
 
     public Player(String name) {
         this.name = name;
         this.hand = new ArrayList<>();
         this.currentCity = "atlanta";
-        this.previousCity = "";
     }
 
     public Player(String name, List<Card> hand, String currentCity) {

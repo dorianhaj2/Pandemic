@@ -33,6 +33,8 @@ public class GameStateDTO implements Serializable {
     private boolean BLUE_ERADICATED;
     private boolean BLACK_ERADICATED;
     private boolean END_GAME;
+    private boolean WIN;
+    private String reason;
     private boolean EASY_MODE;
     private boolean oneQuietNightPlayed;
     private List<Player> players;
@@ -41,6 +43,7 @@ public class GameStateDTO implements Serializable {
     public List<CityCard> infectionDiscardPile;
     public List<Card> playerCardPile;
     public List<Card> playerDiscardPile;
+    private List<City> citiesWithResearchStation;
 
     public GameStateDTO() {
         NUMBER_OF_TURNS = GameState.NUMBER_OF_TURNS;
@@ -63,6 +66,8 @@ public class GameStateDTO implements Serializable {
         BLUE_ERADICATED = GameState.BLUE_ERADICATED;
         BLACK_ERADICATED = GameState.BLACK_ERADICATED;
         END_GAME = GameState.END_GAME;
+        WIN = GameState.WIN;
+        reason = GameState.reason;
         EASY_MODE = GameState.EASY_MODE;
         oneQuietNightPlayed = EventsUtils.oneQuietNightPlayed;
         players = new ArrayList<>(GameController.players);
@@ -71,6 +76,7 @@ public class GameStateDTO implements Serializable {
         infectionDiscardPile = new ArrayList<>(GameController.infectionDiscardPile);
         playerCardPile = new ArrayList<>(GameController.playerCardPile);
         playerDiscardPile = new ArrayList<>(GameController.playerDiscardPile);
+        citiesWithResearchStation = new ArrayList<>(ControlUtils.citiesWithResearchStation);
     }
 
     public void setGameState() {
@@ -94,6 +100,8 @@ public class GameStateDTO implements Serializable {
         GameState.BLUE_ERADICATED = BLUE_ERADICATED;
         GameState.BLACK_ERADICATED = BLACK_ERADICATED;
         GameState.END_GAME = END_GAME;
+        GameState.WIN = WIN;
+        GameState.reason = reason;
         GameState.EASY_MODE = EASY_MODE;
         EventsUtils.oneQuietNightPlayed = oneQuietNightPlayed;
         GameController.players = players;
@@ -102,6 +110,7 @@ public class GameStateDTO implements Serializable {
         GameController.infectionDiscardPile = infectionDiscardPile;
         GameController.playerCardPile = playerCardPile;
         GameController.playerDiscardPile = playerDiscardPile;
+        ControlUtils.citiesWithResearchStation = citiesWithResearchStation;
         ControlUtils.setCurrentPlayerBasedOnNumberOfTurns();
 
         Platform.runLater(new Runnable() {
@@ -119,6 +128,9 @@ public class GameStateDTO implements Serializable {
         UpdateGameBoardUtil.hideWaitToStartLabel();
         ControlUtils.showPhaseOneControls();
         ControlUtils.showOrHideControlsDependingOnCurrentPlayer(false);
+        if (GameState.END_GAME) {
+            GameController.endGame(GameState.WIN, GameState.reason, true);
+        }
     }
 
     @Override
@@ -145,7 +157,6 @@ public class GameStateDTO implements Serializable {
                 ", BLACK_ERADICATED=" + BLACK_ERADICATED +
                 ", END_GAME=" + END_GAME +
                 ", EASY_MODE=" + EASY_MODE +
-                ", Player one previous city: " + players.getFirst().getPreviousCity() +
                 '}';
     }
 }

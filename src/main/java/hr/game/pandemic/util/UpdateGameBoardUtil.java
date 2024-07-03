@@ -1,5 +1,6 @@
 package hr.game.pandemic.util;
 
+import hr.game.pandemic.GameApplication;
 import hr.game.pandemic.GameController;
 import hr.game.pandemic.model.City;
 import hr.game.pandemic.model.GameState;
@@ -32,6 +33,8 @@ public class UpdateGameBoardUtil {
         Button cityButton = (Button) FXMLUtils.getNodeById(city.getName(), GameController._gamePane);
         if(city.isResearchStation()) {
             cityButton.getStyleClass().add("research_station");
+        } else {
+            cityButton.getStyleClass().remove("research_station");
         }
     }
 
@@ -59,43 +62,55 @@ public class UpdateGameBoardUtil {
     }
 
     private static void updateDiseaseCubeCountsAndCures() {
-        FXMLUtils.refreshDiseaseCubeCount();
-        if (GameState.RED_CURE) {
-            ImageView cureImage = (ImageView) FXMLUtils.getNodeById("redCure", GameController._gamePane);
-            cureImage.setVisible(true);
-            if (GameState.RED_ERADICATED) {
-                cureImage.setImage(new Image("images\\red_eradicated.png"));
+            FXMLUtils.refreshDiseaseCubeCount();
+            if (GameState.RED_CURE) {
+                ImageView cureImage = (ImageView) FXMLUtils.getNodeById("redCure", GameController._gamePane);
+                cureImage.setVisible(true);
+                if (GameState.RED_ERADICATED) {
+                    cureImage.setImage(new Image(GameApplication.class.getResource("/hr/game/pandemic/images/red_eradicated.png").toExternalForm()));
+                } else {
+                    cureImage.setImage(new Image(GameApplication.class.getResource("/hr/game/pandemic/images/red_cure.png").toExternalForm()));
+                }
             } else {
-                cureImage.setImage(new Image("images\\red_cure.png"));
+                ImageView cureImage = (ImageView) FXMLUtils.getNodeById("redCure", GameController._gamePane);
+                cureImage.setVisible(false);
             }
-        }
-        if (GameState.YELLOW_CURE) {
-            ImageView cureImage = (ImageView) FXMLUtils.getNodeById("yellowCure", GameController._gamePane);
-            cureImage.setVisible(true);
-            if (GameState.YELLOW_ERADICATED) {
-                cureImage.setImage(new Image("images\\yellow_eradicated.png"));
+            if (GameState.YELLOW_CURE) {
+                ImageView cureImage = (ImageView) FXMLUtils.getNodeById("yellowCure", GameController._gamePane);
+                cureImage.setVisible(true);
+                if (GameState.YELLOW_ERADICATED) {
+                    cureImage.setImage(new Image(GameApplication.class.getResource("/hr/game/pandemic/images/yellow_eradicated.png").toExternalForm()));
+                } else {
+                    cureImage.setImage(new Image(GameApplication.class.getResource("/hr/game/pandemic/images/yellow_cure.png").toExternalForm()));
+                }
             } else {
-                cureImage.setImage(new Image("images\\yellow_cure.png"));
+                ImageView cureImage = (ImageView) FXMLUtils.getNodeById("yellowCure", GameController._gamePane);
+                cureImage.setVisible(false);
             }
-        }
-        if (GameState.BLUE_CURE) {
-            ImageView cureImage = (ImageView) FXMLUtils.getNodeById("blueCure", GameController._gamePane);
-            cureImage.setVisible(true);
-            if (GameState.BLUE_ERADICATED) {
-                cureImage.setImage(new Image("images\\blue_eradicated.png"));
+            if (GameState.BLUE_CURE) {
+                ImageView cureImage = (ImageView) FXMLUtils.getNodeById("blueCure", GameController._gamePane);
+                cureImage.setVisible(true);
+                if (GameState.BLUE_ERADICATED) {
+                    cureImage.setImage(new Image(GameApplication.class.getResource("/hr/game/pandemic/images/blue_eradicated.png").toExternalForm()));
+                } else {
+                    cureImage.setImage(new Image(GameApplication.class.getResource("/hr/game/pandemic/images/blue_cure.png").toExternalForm()));
+                }
             } else {
-                cureImage.setImage(new Image("images\\blue_cure.png"));
+                ImageView cureImage = (ImageView) FXMLUtils.getNodeById("blueCure", GameController._gamePane);
+                cureImage.setVisible(false);
             }
-        }
-        if (GameState.BLACK_CURE) {
-            ImageView cureImage = (ImageView) FXMLUtils.getNodeById("blackCure", GameController._gamePane);
-            cureImage.setVisible(true);
-            if (GameState.BLACK_ERADICATED) {
-                cureImage.setImage(new Image("images\\black_eradicated.png"));
+            if (GameState.BLACK_CURE) {
+                ImageView cureImage = (ImageView) FXMLUtils.getNodeById("blackCure", GameController._gamePane);
+                cureImage.setVisible(true);
+                if (GameState.BLACK_ERADICATED) {
+                    cureImage.setImage(new Image(GameApplication.class.getResource("/hr/game/pandemic/images/black_eradicated.png").toExternalForm()));
+                } else {
+                    cureImage.setImage(new Image(GameApplication.class.getResource("/hr/game/pandemic/images/black_cure.png").toExternalForm()));
+                }
             } else {
-                cureImage.setImage(new Image("images\\black_cure.png"));
+                ImageView cureImage = (ImageView) FXMLUtils.getNodeById("blackCure", GameController._gamePane);
+                cureImage.setVisible(false);
             }
-        }
     }
 
     private static void updatePlayerPositions() {

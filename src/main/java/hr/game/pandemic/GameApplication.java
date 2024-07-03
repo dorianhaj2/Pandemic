@@ -36,7 +36,7 @@ public class GameApplication extends Application {
             HEIGHT = 400;
         } else {
             WIDTH = 1920;
-            HEIGHT = 1080;
+            HEIGHT = 1016;
         }
 
         Scene scene = new Scene(fxmlLoader.load(), WIDTH, HEIGHT);
@@ -54,21 +54,20 @@ public class GameApplication extends Application {
         if(args.length > 0)
             firstArg = args[0];
 
-        boolean z = false;
+        boolean isValidName = false;
 
         for (PlayerEnum value : EnumSet.allOf(PlayerEnum.class)) {
             if (firstArg.equals(value.name())) {
-                z = true;
+                isValidName = true;
                 break;
             }
         }
 
-        if (z) {
+        if (isValidName) {
             player = PlayerEnum.valueOf(firstArg);
         } else {
             throw new WrongPlayerNameException("The game was started with an invalid player name");
         }
-
 
 
         if (player.equals(PlayerEnum.SERVER)) {

@@ -39,15 +39,17 @@ public class InfectUtil {
                     }
                 }
                 if (toInfect) {
+                    System.out.println("Infecting " + cityToInfect.getName());
                     boolean toOutbreak = cityToInfect.infect(diseaseColor, amount);
                     FXMLUtils.refreshCityDiseases(cityToInfect);
                     FXMLUtils.refreshDiseaseCubeCount();
                     if (toOutbreak) {
+                        System.out.println("Outbreak on " + cityToInfect.getName());
                         GameController.outbreaksInCitiesInCurrentChain.add(cityName);
                         GameState.OUTBREAK_COUNTER++;
                         FXMLUtils.moveOutbreakToken();
                         if (GameState.OUTBREAK_COUNTER == 8)
-                            GameController.endGame(false, "Outbreak marker reached last space of the Outbreaks Track!");
+                            GameController.endGame(false, "Outbreak marker reached last space of the Outbreaks Track!", false);
                         else {
                             infectAdjacentCities(cityName, diseaseColor);
                         }

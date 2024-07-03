@@ -177,17 +177,21 @@ public class GameController {
         SaveLoadUtil.saveGame();
     }
 
-    public static void endGame(boolean gameWin, String loseReason) {
+    public static void endGame(boolean gameWin, String loseReason, boolean receivedFromAnotherPlayer) {
         GameState.END_GAME = true;
+        GameState.WIN = gameWin;
+        GameState.reason = loseReason;
+        if (!receivedFromAnotherPlayer)
+            GameApplication.client.sendGameState();
         ControlUtils.showOrHideControlsDependingOnCurrentPlayer(true);
         ControlUtils.disableAllOtherControls("");
         ControlUtils.disableAllCityButtons();
         Alert endGameAlert = new Alert(Alert.AlertType.INFORMATION);
         if (gameWin) {
-            endGameAlert.setTitle("Congratulations!");
+            endGameAlert.setTitle(GameApplication.player.name() + " - Congratulations!");
             endGameAlert.setHeaderText("You won!");
         } else {
-            endGameAlert.setTitle("Game over!");
+            endGameAlert.setTitle(GameApplication.player.name() + " - Game over!");
             endGameAlert.setHeaderText(loseReason);
         }
         endGameAlert.showAndWait();

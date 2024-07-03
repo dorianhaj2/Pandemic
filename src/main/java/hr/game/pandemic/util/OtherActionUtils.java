@@ -71,7 +71,7 @@ public class OtherActionUtils {
                     toTake = PlayerDialogUtil.showTakeCardOrGiveCardDialog();
                 }
                 if (!toTake) {
-                    Player pickedPlayer = PlayerDialogUtil.showPickAnotherPlayerDialog("Pick a player to give a city card to.", true);
+                    Player pickedPlayer = PlayerDialogUtil.showPickAnotherPlayerDialog("Pick a player to give a city card to.", ControlUtils.currentPlayer, true);
                     if (pickedPlayer != null) {
                         Card cardToGive = null;
                         if (ControlUtils.currentPlayer instanceof Researcher) {
@@ -99,7 +99,7 @@ public class OtherActionUtils {
             if (toTake || (!currentPlayerHasCurrentCityCardOrIsAResearcher && (anotherPlayerIsAResearcher || anotherPlayerHasCurrentCityCard))) {
                 Card cardToTake = null;
                 playersOnCurrentCity.remove(ControlUtils.currentPlayer);
-                Player playerToTakeFrom = PlayerDialogUtil.showPickAnotherPlayerDialog("Choose a player to take a city card from.", false, playersOnCurrentCity);
+                Player playerToTakeFrom = PlayerDialogUtil.showPickAnotherPlayerDialog("Choose a player to take a city card from.", false, ControlUtils.currentPlayer, playersOnCurrentCity);
 
                 if (playerToTakeFrom instanceof Researcher) {
                     cardToTake = CardDialogUtils.showPickACardDialog(playerToTakeFrom, "city", "Choose a card to take from the researcher.");
@@ -174,7 +174,7 @@ public class OtherActionUtils {
                 cureImage.setVisible(true);
 
                 if (GameState.YELLOW_CURE && GameState.BLUE_CURE && GameState.RED_CURE && GameState.BLACK_CURE)
-                    GameController.endGame(true, "");
+                    GameController.endGame(true, "", false);
 
                 MovementActionUtils.actionDone();
             }

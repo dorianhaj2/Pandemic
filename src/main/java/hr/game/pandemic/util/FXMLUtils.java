@@ -28,20 +28,16 @@ import java.util.stream.Collectors;
 public class FXMLUtils {
     public static void moveOutbreakToken() {
         if (GameState.OUTBREAK_COUNTER > 0) {
-            ImageView iv = (ImageView) getNodeById("outbreak" + GameState.OUTBREAK_COUNTER, GameController._gamePane);
-            iv.setVisible(true);
-            if (GameState.OUTBREAK_COUNTER > 1){
-                ImageView ivPrev = (ImageView) getNodeById("outbreak" + (GameState.OUTBREAK_COUNTER - 1), GameController._gamePane);
-                ivPrev.setVisible(false);
+            for (int i = 1; i <= 8; i++) {
+                ImageView iv = (ImageView) getNodeById("outbreak" + i, GameController._gamePane);
+                iv.setVisible(i == GameState.OUTBREAK_COUNTER);
             }
         }
     }
     public static void moveInfectionRateToken() {
-        ImageView iv = (ImageView) getNodeById("infectionRate" + GameState.INFECTION_RATE, GameController._gamePane);
-        iv.setVisible(true);
-        if (GameState.INFECTION_RATE > 1) {
-            ImageView ivPrev = (ImageView) getNodeById("infectionRate" + (GameState.INFECTION_RATE - 1), GameController._gamePane);
-            ivPrev.setVisible(false);
+        for (int i = 1; i <= 7; i++) {
+            ImageView iv = (ImageView) getNodeById("infectionRate" + i, GameController._gamePane);
+            iv.setVisible(i == GameState.INFECTION_RATE);
         }
     }
     public static void addPlayerToPlayersGrid(GridPane playersGrid, Integer playerNumber){
@@ -139,11 +135,13 @@ public class FXMLUtils {
         roleLabel.setText(roleName);
     }
     public static void updatePlayerLocation(Player player) {
-        if (!player.getPreviousCity().isEmpty()) {
-            ImageView previousCityPlayerImage = (ImageView) getNodeById(player.getPreviousCity() + player.getName() + "Image", GameController._gamePane);
-            previousCityPlayerImage.setImage(null);
-        }
         if (!player.getCurrentCity().isEmpty()) {
+            for (City city : GameController.cities) {
+                if (!city.getName().equals(player.getCurrentCity())) {
+                    ImageView cityPlayerImage = (ImageView) getNodeById(city.getName() + player.getName() + "Image", GameController._gamePane);
+                    cityPlayerImage.setImage(null);
+                }
+            }
             String cityName = player.getCurrentCity().substring(0, 1).toUpperCase() + player.getCurrentCity().substring(1);
             String cityNameNormalCase = StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(cityName), StringUtils.SPACE);
             Label cityLabel = (Label) getNodeById(player.getName().toLowerCase() + "Location", GameController._gamePane);

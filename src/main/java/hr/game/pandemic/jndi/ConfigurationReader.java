@@ -25,7 +25,7 @@ public class ConfigurationReader {
         try(InitialDirContextCloseable context = new InitialDirContextCloseable(configureEnvironment())) {
 
             String fileName = "conf.properties";
-            Object object =context.lookup(fileName);
+            Object object = context.lookup(fileName);
 
             Properties properties = new Properties();
             properties.load(new FileReader(object.toString()));

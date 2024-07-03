@@ -21,7 +21,7 @@ public class Server {
                     Socket socket = serverSocket.accept();
                     System.out.println("A new client has connected");
 
-                    ClientHandler clientHandler = new ClientHandler(socket);
+                    ClientHandlerThread clientHandler = new ClientHandlerThread(socket);
                     Thread thread = new Thread(clientHandler);
 
                     thread.start();

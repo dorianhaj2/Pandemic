@@ -69,10 +69,13 @@ public class ShowActionControlsUtil {
 
     public static void showTreatDiseaseButton() {
         ControlUtils.controlGrid.getChildren().removeIf(node -> node.getId().equals("action6"));
-        City currentCity = GameController.cities.stream()
+        Optional<City> currentCityOptional = GameController.cities.stream()
                 .filter(c -> c.getName().equals(ControlUtils.currentPlayer.getCurrentCity()))
-                .findAny()
-                .orElse(null);
+                .findAny();
+        City currentCity = new City();
+        if(currentCityOptional.isPresent()) {
+            currentCity = currentCityOptional.get();
+        }
 
         if (!currentCity.getDiseases().isEmpty()) {
             Button treatDiseaseButton = new Button("Treat disease");

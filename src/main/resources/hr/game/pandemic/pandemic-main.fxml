@@ -112,6 +112,7 @@
                                       </columnConstraints>
                                       <rowConstraints>
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints />
                                       </rowConstraints>
                                        <children>
                                           <TextField fx:id="chatTextInput" prefHeight="25.0" prefWidth="449.0" GridPane.rowIndex="1" />

@@ -8,6 +8,7 @@ import hr.game.pandemic.model.GameState;
 import hr.game.pandemic.model.roles.Medic;
 import javafx.event.Event;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
@@ -32,7 +33,6 @@ public class MovementActionUtils {
     }
 
     public static void moveCurrentPlayerToCity(String city) {
-        ControlUtils.currentPlayer.setPreviousCity(ControlUtils.currentPlayer.getCurrentCity());
         ControlUtils.currentPlayer.setCurrentCity(city);
         Optional<City> currentCityOptional = GameController.cities.stream()
                 .filter(c -> c.getName().equals(ControlUtils.currentPlayer.getCurrentCity()))
@@ -48,6 +48,7 @@ public class MovementActionUtils {
                     currentCity.cureAllOfDisease("blue");
                 if (GameState.BLACK_CURE)
                     currentCity.cureAllOfDisease("black");
+                FXMLUtils.refreshCityDiseases(currentCity);
             }
         }
         FXMLUtils.updatePlayerLocation(ControlUtils.currentPlayer);
@@ -78,11 +79,17 @@ public class MovementActionUtils {
     public static void startPhaseTwo() {
         if (!GameState.END_GAME) {
             boolean drawnEpidemic = DrawDiscardUtil.playerDrawCard(ControlUtils.currentPlayer);
-            if (drawnEpidemic)
+            Alert epidemicCardDrawnAlert = new Alert(Alert.AlertType.INFORMATION);
+            epidemicCardDrawnAlert.setTitle(GameApplication.player.name() + " - Epidemic card!");
+            epidemicCardDrawnAlert.setHeaderText("You drew and epidemic card!");
+            if (drawnEpidemic) {
+                epidemicCardDrawnAlert.showAndWait();
                 onEpidemicCardDraw();
+            }
             boolean drawnSecondEpidemic = DrawDiscardUtil.playerDrawCard(ControlUtils.currentPlayer);
 
             if (drawnSecondEpidemic) {
+                epidemicCardDrawnAlert.showAndWait();
                 onEpidemicCardDraw();
             }
             DrawDiscardUtil.checkIfPlayerHasTooManyCards(ControlUtils.currentPlayer);
@@ -93,8 +100,8 @@ public class MovementActionUtils {
     public static void onEpidemicCardDraw() {
         if (!GameState.END_GAME) {
             //1. Increase
-            GameState.INFECTION_RATE++;
-            if (GameState.INFECTION_RATE < 8) {
+            if (GameState.INFECTION_RATE < 7) {
+                GameState.INFECTION_RATE++;
                 FXMLUtils.moveInfectionRateToken();
             }
             //2. Infect
@@ -175,16 +182,16 @@ public class MovementActionUtils {
                 ControlUtils.disableAllCityButtons();
                 ControlUtils.showOrHideControlsDependingOnCurrentPlayer(false);
             } else if (EventsUtils.airliftPlayed) {
-                MovementActionUtils.moveCurrentPlayerToCity(b.getId());
+                moveCurrentPlayerToCity(b.getId());
                 ControlUtils.setCurrentPlayerBasedOnNumberOfTurns();
                 EventsUtils.airliftPlayed = false;
                 ControlUtils.disableAllCityButtons();
                 ControlUtils.showOrHideControlsDependingOnCurrentPlayer(false);
                 GameApplication.client.sendGameState();
             } else {
-                MovementActionUtils.moveCurrentPlayerToCity(b.getId());
+                moveCurrentPlayerToCity(b.getId());
                 ControlUtils.disableAllCityButtons();
-                MovementActionUtils.actionDone();
+                actionDone();
             }
     }
 

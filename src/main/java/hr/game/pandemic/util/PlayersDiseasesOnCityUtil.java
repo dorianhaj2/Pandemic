@@ -64,6 +64,8 @@ public class PlayersDiseasesOnCityUtil {
         newCityDiseaseGridPane.setId(c.getName() + "DiseaseGrid");
         int gridOffset = 25;
         if (c.getName().equals("sanFrancisco")) gridOffset = 18;
+        if (c.getName().equals("baghdad")) gridOffset = 30;
+        if (c.getName().equals("riyadh")) gridOffset = 20;
         newCityDiseaseGridPane.setLayoutX(cityButton.getLayoutX() - gridOffset);
         newCityDiseaseGridPane.setLayoutY(cityButton.getLayoutY() - 25);
         newCityDiseaseGridPane.setMouseTransparent(true);

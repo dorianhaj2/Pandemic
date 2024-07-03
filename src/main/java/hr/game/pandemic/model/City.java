@@ -51,7 +51,6 @@ public class City implements Serializable {
                         || GameState.BLUE_CURE && disease.equals("blue")
                         || GameState.YELLOW_CURE && disease.equals("yellow")
                         || GameState.RED_CURE && disease.equals("red")))){
-                    //System.out.println("Infecting " + name);
                     this.diseases.add(disease);
                     if (disease.equals("yellow"))
                         GameState.YELLOW_CUBES--;
@@ -65,7 +64,7 @@ public class City implements Serializable {
                 }
             } else {
                 if (GameState.YELLOW_CUBES < 0 || GameState.BLACK_CUBES < 0 || GameState.BLUE_CUBES < 0 || GameState.RED_CUBES < 0) {
-                    GameController.endGame(false, "No " + disease + " disease cubes left!");
+                    GameController.endGame(false, "No " + disease + " disease cubes left!", false);
                     return false;
                 }
 
@@ -73,7 +72,7 @@ public class City implements Serializable {
             }
         }
         if (GameState.YELLOW_CUBES < 0 || GameState.BLACK_CUBES < 0 || GameState.BLUE_CUBES < 0 || GameState.RED_CUBES < 0)
-            GameController.endGame(false, "No " + disease + " disease cubes left!");
+            GameController.endGame(false, "No " + disease + " disease cubes left!", false);
         return false;
     }
 

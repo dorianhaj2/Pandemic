@@ -47,7 +47,7 @@ public class SaveLoadUtil {
 
     private static void showAlert(String title, String text) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
+        alert.setTitle(GameApplication.player.name() + title);
         alert.setHeaderText(text);
         alert.showAndWait();
     }

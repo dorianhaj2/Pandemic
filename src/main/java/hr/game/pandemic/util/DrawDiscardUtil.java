@@ -9,7 +9,7 @@ import hr.game.pandemic.model.Player;
 public class DrawDiscardUtil {
     public static boolean playerDrawCard(Player player) {
         if (GameController.playerCardPile.isEmpty())
-            GameController.endGame(false, "No player cards left to draw!");
+            GameController.endGame(false, "No player cards left to draw!", false);
         else {
             if (GameController.playerCardPile.getLast().getName().equals("Epidemic")) {
                 GameController.playerCardPile.removeLast();

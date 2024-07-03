@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface RemoteService extends Remote {
 
-    public static final String REMOTE_OBJECT_NAME = "hr.game.pandemic.rmi.service";
+    String REMOTE_OBJECT_NAME = "hr.game.pandemic.rmi.service";
 
     void sendMessage(ChatMessage message) throws RemoteException;
 

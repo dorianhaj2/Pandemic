@@ -21,7 +21,7 @@ public class PlayerDialogUtil {
         ButtonType another = new ButtonType("Another player");
         ButtonType cancel = new ButtonType("Cancel");
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Yourself or another");
+        alert.setTitle(GameApplication.player.name() + " - Yourself or another");
         alert.setHeaderText("Choose to move yourself or another player.");
         alert.getButtonTypes().setAll(you, another, cancel);
 
@@ -30,14 +30,14 @@ public class PlayerDialogUtil {
         if (result.get() == you) {
             playerToMove = eventPlayer;
         } else if (result.get() == another) {
-            playerToMove = showPickAnotherPlayerDialog("Pick a player to move.", false);
+            playerToMove = showPickAnotherPlayerDialog("Pick a player to move.", eventPlayer, false);
         } else if (result.get() == cancel) {
             return null;
         }
         return playerToMove;
     }
 
-    public static Player showPickAnotherPlayerDialog(String title, boolean currentCityOnly, List<Player> players) {
+    public static Player showPickAnotherPlayerDialog(String title, boolean currentCityOnly, Player exceptPlayer, List<Player> players) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(GameApplication.class.getResource("dialog_fxmls/pick-a-card-dialog.fxml"));
             DialogPane pickACardDialogPane = fxmlLoader.load();
@@ -58,7 +58,7 @@ public class PlayerDialogUtil {
             }
             for (int i = 0; i < playersToGet.size(); i++) {
                 Player player = playersToGet.get(i);
-                if (!player.equals(ControlUtils.currentPlayer)) {
+                if (!player.equals(exceptPlayer)) {
                     Button tmpButton = new Button(player.getName().substring(0, 1).toUpperCase() + player.getName().substring(1));
                     GridPane.setMargin(tmpButton, new Insets(10, 10, 10, 10));
                     tmpButton.setUserData(player);
@@ -91,13 +91,13 @@ public class PlayerDialogUtil {
         return null;
     }
 
-    public static Player showPickAnotherPlayerDialog(String title, boolean currentCityOnly) {
-        return showPickAnotherPlayerDialog(title, currentCityOnly, null);
+    public static Player showPickAnotherPlayerDialog(String title, Player exceptPlayer, boolean currentCityOnly) {
+        return showPickAnotherPlayerDialog(title, currentCityOnly, exceptPlayer, null);
     }
 
     public static boolean showTakeCardConfirmationDialog(Player player) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Are you sure?");
+        alert.setTitle(GameApplication.player.name() + " - Are you sure?");
         alert.setHeaderText("Take card from " + player.getName() + "?");
 
 
@@ -109,7 +109,7 @@ public class PlayerDialogUtil {
         ButtonType take = new ButtonType("Take", ButtonBar.ButtonData.CANCEL_CLOSE);
         ButtonType give = new ButtonType("Give", ButtonBar.ButtonData.CANCEL_CLOSE);
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Do you want to give a card to a player or take a card from a player?", take, give);
-        //alert.setTitle("Do you want to give a card to a player or take a card from a player?");
+        alert.setTitle(GameApplication.player.name());
 
         Optional<ButtonType> option = alert.showAndWait();
         return take.equals(option.get());

@@ -8,6 +8,7 @@ import hr.game.pandemic.model.roles.QuarantineSpecialist;
 import hr.game.pandemic.model.roles.Researcher;
 import hr.game.pandemic.model.roles.Scientist;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 
@@ -20,6 +21,7 @@ public class NewGameUtil {
         if (GameApplication.player.equals(PlayerEnum.PLAYER1)) {
             GameState.START_GAME = DialogUtils.showNewGameDialog();
             if (GameState.START_GAME) {
+                System.out.println("New game started");
                 GameState.NUMBER_OF_TURNS = 0;
                 GameState.OUTBREAK_COUNTER = 0;
                 GameState.INFECTION_RATE = 1;
@@ -72,7 +74,6 @@ public class NewGameUtil {
                 //Remove players from board on new game
                 if (!GameController.players.isEmpty()) {
                     for (Player p : GameController.players) {
-                        p.setPreviousCity(p.getCurrentCity());
                         p.setCurrentCity("");
                         FXMLUtils.updatePlayerLocation(p);
                     }
@@ -110,6 +111,11 @@ public class NewGameUtil {
                 for (City c : GameController.cities) {
                     if (c.getName().equals("atlanta"))
                         ControlUtils.citiesWithResearchStation.add(c);
+                    else {
+                        c.setResearchStation(false);
+                        Button cButton = (Button) FXMLUtils.getNodeById(c.getName(), GameController._gamePane);
+                        cButton.getStyleClass().remove("research_station");
+                    }
                 }
 
                 //Players draw cards
@@ -132,6 +138,8 @@ public class NewGameUtil {
                         InfectUtil.infectCity(GameController.infectionDiscardPile.getLast().getName(), GameController.infectionDiscardPile.getLast().getColor(), 3 - i);
                     }
                 }
+
+                UpdateGameBoardUtil.updateBoard();
                 ControlUtils.currentPlayer = GameController.players.getFirst();
                 GameController.SETUP = false;
                 GameApplication.client.sendGameState();

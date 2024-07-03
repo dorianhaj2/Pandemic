@@ -100,7 +100,7 @@ public class EventsUtils {
 
     public static void onOneQuietNightEventPlay() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("One Quiet Night");
+        alert.setTitle(GameApplication.player.name() + " - One Quiet Night");
         alert.setHeaderText("Are you sure you want to play this event card?");
 
         Optional<ButtonType> result = alert.showAndWait();

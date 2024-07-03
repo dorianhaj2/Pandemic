@@ -6,9 +6,9 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class ClientHandler implements Runnable {
+public class ClientHandlerThread implements Runnable {
 
-    public static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
+    public static ArrayList<ClientHandlerThread> clientHandlers = new ArrayList<>();
     private Socket socket;
     private InputStream inputStream;
     private ObjectInputStream objectInputStream;
@@ -17,7 +17,7 @@ public class ClientHandler implements Runnable {
     private String clientUsername;
     private static int playerNumber = 1;
 
-    public ClientHandler(Socket socket) {
+    public ClientHandlerThread(Socket socket) {
         try {
             this.socket = socket;
             clientUsername = "Player " + playerNumber;
@@ -42,7 +42,7 @@ public class ClientHandler implements Runnable {
             try {
                 GameStateDTO gameStateDTO = (GameStateDTO) objectInputStream.readObject();
                 System.out.println(clientUsername + " is broadcasting game state");
-                broadcastMessage(gameStateDTO);
+                broadcastGameState(gameStateDTO);
             } catch (IOException e) {
                 closeEverything(socket, objectInputStream, objectOutputStream);
                 break;
@@ -52,8 +52,8 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    public void broadcastMessage(GameStateDTO gameStateToSend) {
-        for (ClientHandler clientHandler : clientHandlers) {
+    public void broadcastGameState(GameStateDTO gameStateToSend) {
+        for (ClientHandlerThread clientHandler : clientHandlers) {
             try {
                 if (!clientHandler.clientUsername.equals(clientUsername)) {
                     System.out.println("Sending game state to " + clientHandler.clientUsername);

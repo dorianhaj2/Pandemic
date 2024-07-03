@@ -7,7 +7,6 @@
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
 
 <DialogPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hr.game.pandemic.dialogs.NewGameDialog">
    <buttonTypes>
@@ -32,11 +31,7 @@
                </toggleGroup></RadioButton>
             <RadioButton fx:id="numTwo" layoutX="248.0" layoutY="231.0" mnemonicParsing="false" selected="true" text="2" toggleGroup="$numberOfPlayers" />
             <RadioButton fx:id="numThree" layoutX="306.0" layoutY="231.0" mnemonicParsing="false" text="3" toggleGroup="$numberOfPlayers" />
-            <CheckBox fx:id="cheatCheckBox" layoutX="7.0" layoutY="409.0" mnemonicParsing="false" text="Koristan alat koji će nam pomoći kasnije">
-               <font>
-                  <Font size="8.0" />
-               </font>
-            </CheckBox>
+            <CheckBox fx:id="cheatCheckBox" layoutX="53.0" layoutY="409.0" mnemonicParsing="false" text="Cheat" />
          </children>
       </AnchorPane>
    </content>
